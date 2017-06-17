@@ -91,11 +91,18 @@ public class Window
   
   public void refresh()
   {
+  	// First make the cursor invisible so that it's not seen while the screen is drawn
     terminal.setCursorVisible(false);
+    
+    // bufferStartRow is the row into the display buffer that is the first to be displayed
+    // at the top of the window.  Note that this can be a negative number if the window is
+    // larger than the number of rows in the buffer.
     int bufferStartRow = displayBuffer.getNumberOfRowsWithContent() - height;
+    
+    // Go through the window line by line and draw what needs to be drawn.
     for (int i = 0; i < height; i++)
     {
-      terminal.moveCursor(0 + leftPosition, i + topPosition);
+      terminal.moveCursor(leftPosition, i + topPosition);
       int bufferRow = bufferStartRow + i;
       if (bufferRow >= 0)
       {

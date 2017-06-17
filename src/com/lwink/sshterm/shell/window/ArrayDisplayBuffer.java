@@ -17,6 +17,19 @@ package com.lwink.sshterm.shell.window;
 
 import com.lwink.sshterm.terminal.api.Terminal;
 
+/**
+ * The display buffer implementation.  Internally, everything is stored as an
+ * array of integers serving as terminal cells.  The reason for 
+ * using integers instead of a complex object is so that everything is backed
+ * by a true array of values instead of an array of references.  This speeds
+ * things up a lot.
+ * 
+ * Cell format is as follows:
+ * [xxxxxxxxxCCCCCCCCTTTTTTTTTTTTTTTT]
+ * x = Not used.
+ * C = Color bits
+ * T = Character bits
+ */
 public class ArrayDisplayBuffer implements DisplayBuffer
 {
   private int[] buffer;

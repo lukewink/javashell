@@ -18,6 +18,7 @@ package com.lwink.sshterm.shell.api;
 /**
  * Interface that gets passed to a Shell in order to receive input from the terminal.
  */
+@FunctionalInterface
 public interface InputCallback
 {
   /**
