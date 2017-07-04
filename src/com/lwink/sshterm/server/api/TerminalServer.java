@@ -19,5 +19,17 @@ public interface TerminalServer
 {
 	void start(TerminalCreatedListener terminalCreatedListener, TerminalClosedListener terminalClosedListener);
   
+	/**
+	 * Causes the calling thread to block until either the thread has been interrupted, or the 
+	 * {@link #stop()} function has been called.
+	 * 
+	 * @throws InterruptedException If the current thread is interrupted.
+	 */
+	void waitForStop() throws InterruptedException;
+	
+	/**
+	 * Stops the server.  Any threads waiting on the {@link #waitForStop()} function will become
+	 * unblocked.
+	 */
   void stop();
 }

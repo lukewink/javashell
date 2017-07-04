@@ -75,12 +75,19 @@ public class SshTerminalServer implements TerminalServer
   }
   
   @Override
+  public void waitForStop() throws InterruptedException
+  {
+  	sshd.wait();
+  }
+  
+  @Override
   public void stop()
   {
     LOG.info("Stopping ShellServer");
     try
     {
       sshd.stop();
+      sshd.notifyAll();
     }
     catch (IOException e)
     {
@@ -120,6 +127,7 @@ public class SshTerminalServer implements TerminalServer
     private InputStream inputStream;
     private OutputStream outputStream;
     private SshAnsiTerminal terminal;
+    private ExitCallback exitCallback;
 
     /**
      * Called by MINA when the shell has been terminated.
@@ -146,7 +154,7 @@ public class SshTerminalServer implements TerminalServer
     @Override
     public void setExitCallback(ExitCallback exitCallback)
     {
-      System.out.println("setExitCallback"); 
+      this.exitCallback = exitCallback;
     }
 
     /**
