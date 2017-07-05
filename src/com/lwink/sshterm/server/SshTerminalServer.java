@@ -42,13 +42,15 @@ public class SshTerminalServer implements TerminalServer
   private SshServer sshd;
   private Optional<TerminalCreatedListener> terminalCreatedListener = Optional.empty();
   private Optional<TerminalClosedListener> terminalClosedListener = Optional.empty();
+  private Optional<PasswordAuthenticator> passwordAuthenticator = Optional.empty();
   private int port;
   private File keyFile;
   
-  public SshTerminalServer(int port, File keyFile)
+  public SshTerminalServer(int port, File keyFile, PasswordAuthenticator authenticator)
   {
   	this.port = port;
   	this.keyFile = keyFile;
+  	this.passwordAuthenticator = Optional.ofNullable(authenticator);
   }
   
   @Override
@@ -97,7 +99,7 @@ public class SshTerminalServer implements TerminalServer
   
   protected PasswordAuthenticator getPasswordAuthenticator()
   {
-  	return (user, password, server) -> true;
+  	return passwordAuthenticator.orElse((user, password, server) -> true);
   }
   
   /**
