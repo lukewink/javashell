@@ -22,11 +22,13 @@ import java.io.OutputStream;
 import java.util.Optional;
 
 import org.apache.sshd.common.Factory;
+import org.apache.sshd.common.config.keys.KeyUtils;
 import org.apache.sshd.server.Command;
 import org.apache.sshd.server.Environment;
 import org.apache.sshd.server.ExitCallback;
 import org.apache.sshd.server.SshServer;
 import org.apache.sshd.server.auth.password.PasswordAuthenticator;
+import org.apache.sshd.server.keyprovider.AbstractGeneratorHostKeyProvider;
 import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,9 +63,13 @@ public class SshTerminalServer implements TerminalServer
     try
     {
       LOG.info("Starting ShellServer");
+      
+      AbstractGeneratorHostKeyProvider hostKeyProvider = new SimpleGeneratorHostKeyProvider(keyFile);
+      hostKeyProvider.setAlgorithm(KeyUtils.RSA_ALGORITHM);
+      
       sshd = SshServer.setUpDefaultServer();
       sshd.setPort(port);
-      sshd.setKeyPairProvider(new SimpleGeneratorHostKeyProvider(keyFile));
+      sshd.setKeyPairProvider(hostKeyProvider);
       sshd.setPasswordAuthenticator(getPasswordAuthenticator());
       sshd.setShellFactory(new ShellFactory());
       sshd.start();
