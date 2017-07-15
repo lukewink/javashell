@@ -272,7 +272,7 @@ public class SshAnsiTerminal implements Terminal, SignalListener
   {
     ByteBuffer bb = ByteBufferBuilder.create()
         .csi()
-        .add(where.equals(CursorPosition.BEFORE_CURSOR) ? 0 : where.equals(CursorPosition.AFTER_CURSOR) ? 1 : 2)
+        .add(where.equals(CursorPosition.BEFORE_CURSOR) ? '1' : where.equals(CursorPosition.AFTER_CURSOR) ? '0' : '2')
         .add('K')
         .build();
     writeBytes(bb);
