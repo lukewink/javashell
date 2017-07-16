@@ -18,12 +18,21 @@ public class InputWindowTest
 	InputWindow w;
 	int width = 15;
 	int height = 20;
+	int inputWindowWidth = 10;
 	int inputWindowRow = 5;
+	String expectedAfterInputWindow;
 	
 	public InputWindowTest()
 	{
 		terminal = new TestTerminal(width, height);
-		w = new InputWindow(terminal, width-1, inputWindowRow);
+		w = new InputWindow(terminal, inputWindowWidth, inputWindowRow);
+		
+		StringBuffer sb = new StringBuffer();
+		for (int i = 0; i < width - inputWindowWidth; i++)
+		{
+			sb.append(' ');
+		}
+		expectedAfterInputWindow = sb.toString();
 	}
 
 	@Before
@@ -59,8 +68,10 @@ public class InputWindowTest
 	@Test
 	public void testScroll()
 	{
-		// Add 20 characters
-		addChars("0123456789abcdefghij");
+		// Add 20 characters when the terminal width is only 10
+		String twentyChars = "0123456789abcdefghij";
+		addChars(twentyChars);
+		verify(twentyChars, "bcdefghij ", 9);
 	}
 	
 	public void addChars(String chars)
@@ -73,15 +84,38 @@ public class InputWindowTest
 	
 	public void verify(String expected)
 	{
-		verify(expected, expected);
+		verify(expected, padToWidth(expected, inputWindowWidth));
 	}
 	
 	public void verify(String expected, String visible)
 	{
+		verify(expected, visible, -1);
+	}
+	
+	/**
+	 * Verifies aspects of the terminal and input window state.
+	 * 
+	 * @param expected The expected value of the input window contents
+	 * @param visible The expected value of the terminal column that the input window is on.
+	 * @param cursorCol If this value is not negative, this function will verify that the cursor is
+	 *        at the passed column.
+	 */
+	public void verify(String expected, String visible, int cursorCol)
+	{
 		w.refresh();
 		Assert.assertEquals(expected, w.getWindowContents());
 		String termStr = terminal.getRowString(inputWindowRow);
-		Assert.assertEquals(padToWidth(visible, width), termStr);
+		String termInputWindow = termStr.substring(0, inputWindowWidth);
+		Assert.assertEquals(visible, termInputWindow);
+		
+		// Make sure the window didn't write too far
+		String afterInputWindow = termStr.substring(inputWindowWidth);
+		Assert.assertEquals(expectedAfterInputWindow, afterInputWindow);
+		
+		if (cursorCol > 0)
+		{
+			Assert.assertEquals(cursorCol, terminal.cursorCol);
+		}
 	}
 	
 	public String padToWidth(String str, int width)
