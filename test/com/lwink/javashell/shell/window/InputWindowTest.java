@@ -74,6 +74,15 @@ public class InputWindowTest
 		verify(twentyChars, "bcdefghij ", 9);
 	}
 	
+	@Test
+	public void testCursor()
+	{
+		w.cursorLeft();
+		verify("", 0);
+		w.cursorRight();
+		verify("", 0);
+	}
+	
 	public void addChars(String chars)
 	{
 		for (int i = 0; i < chars.length(); i++)
@@ -90,6 +99,11 @@ public class InputWindowTest
 	public void verify(String expected, String visible)
 	{
 		verify(expected, visible, -1);
+	}
+	
+	public void verify(String expected, int cursorCol)
+	{
+		verify(expected, padToWidth(expected, inputWindowWidth), cursorCol);
 	}
 	
 	/**
