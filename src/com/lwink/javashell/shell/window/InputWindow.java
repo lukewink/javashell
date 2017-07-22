@@ -23,20 +23,29 @@ import com.lwink.javashell.terminal.api.Terminal;
 public class InputWindow
 {
   private StringBuilder buffer;
-  private int cursorPos;
+  private int bufferCursorPos;
   private int visiblePos;
   private int width;
   private int row;
+  private int col;
   private Terminal terminal;
+  private String prompt;
   
   public InputWindow(Terminal terminal, int width, int row)
   {
     buffer = new StringBuilder(100);
-    cursorPos = 0;
+    bufferCursorPos = 0;
     visiblePos = 0;
     this.terminal = terminal;
     this.width = width;
     this.row = row;
+    this.col = 0;
+    prompt = "";
+  }
+  
+  public void setPrompt(String prompt)
+  {
+  	this.prompt = prompt;
   }
   
   /**
@@ -44,9 +53,10 @@ public class InputWindow
    */
   public void cursorLeft()
   {
-    if (cursorPos > 0)
+    if (bufferCursorPos > 0)
     {
-      terminal.moveCursor(--cursorPos, row);
+    	--bufferCursorPos;
+      resetCursorPosition();
       terminal.flush();
     }
     else
@@ -64,14 +74,14 @@ public class InputWindow
    */
   public void cursorRight()
   {
-    if (cursorPos + visiblePos >= buffer.length())
+    if (bufferCursorPos + visiblePos >= buffer.length())
     {
       // The cursor is already at the end of the input.  We could sound a bell or flash the 
       // screen here if needed.
       return;
     }
     
-    if (cursorPos + 1 == width)
+    if (bufferCursorPos + 1 == width)
     {
       // The cursor is already in the last cell, so we need to "scroll" to the right
       visiblePos++;
@@ -79,7 +89,8 @@ public class InputWindow
     }
     else
     {
-      terminal.moveCursor(++cursorPos, row);
+    	++bufferCursorPos;
+      resetCursorPosition();
       terminal.flush();
     }
   }
@@ -94,7 +105,7 @@ public class InputWindow
    */
   public InputWindow addChar(char c)
   {
-    buffer.insert(cursorPos + visiblePos, c);
+    buffer.insert(bufferCursorPos + visiblePos, c);
     cursorRight();
     return this;
   }
@@ -133,19 +144,19 @@ public class InputWindow
   public InputWindow clearWindowContents()
   {
     buffer.delete(0, buffer.length());
-    cursorPos = 0;
+    bufferCursorPos = 0;
     return this;
   }
   
   public InputWindow deleteCharBehindCursorPos()
   {
-    int deletePos = cursorPos + visiblePos - 1; // -1 because we delete the character behind the cursor
+    int deletePos = bufferCursorPos + visiblePos - 1; // -1 because we delete the character behind the cursor
     if (buffer.length() > deletePos && deletePos >= 0)
     {
       buffer.deleteCharAt(deletePos);
-      if (cursorPos > 0)
+      if (bufferCursorPos > 0)
       {
-        cursorPos--;
+        bufferCursorPos--;
       }
       else if (visiblePos > 0)
       {
@@ -169,7 +180,7 @@ public class InputWindow
       this.row = row;
       
       visiblePos = Math.max(buffer.length() - width + 1, 0);
-      cursorPos = Math.min(buffer.length(), width - 1);
+      bufferCursorPos = Math.min(buffer.length(), width - 1);
       refresh();
     }
   }
@@ -180,15 +191,28 @@ public class InputWindow
   public void refresh()
   {
     terminal.setCursorVisible(false);
-    terminal.moveCursor(0, row);
+    terminal.moveCursor(col, row);
+    
+    // First draw the prompt
+    int promptVisibleChars = Math.min(prompt.length(), width - 1);
+		IntStream.range(0, promptVisibleChars)
+					   .map(prompt::charAt)
+		         .forEach(c -> terminal.putCharacter((char) c));
 
-    int count = Math.min(buffer.length(), width - 1);
+    // This variable holds the number of visible characters.  The minus 1 at the end is
+    // so that there is room for the cursor at the end of the buffer
+    int bufferVisibleChars = Math.min(buffer.length(), width - promptVisibleChars - 1);
 
-    IntStream.range(visiblePos, count + visiblePos)
-        .map(buffer::charAt)
-        .forEach(c -> terminal.putCharacter((char)c));
+    if (bufferVisibleChars > 0)
+		{
+			IntStream.range(visiblePos, bufferVisibleChars + visiblePos)
+			         .map(buffer::charAt)
+					     .forEach(c -> terminal.putCharacter((char) c));
+		}
+    // Erase everything after the cursor's current position
     terminal.eraseLineWithCursor(CursorPosition.AFTER_CURSOR);
-    terminal.moveCursor(cursorPos, row);
+    
+    resetCursorPosition();
     terminal.setCursorVisible(true);
     terminal.flush();
   }
@@ -198,7 +222,17 @@ public class InputWindow
    */
   public void resetCursorPosition()
   {
-    terminal.moveCursor(cursorPos, row);
+    terminal.moveCursor(getTerminalCursorCol(), row);
+  }
+  
+  /**
+   * Gets column that the Terminal cursor should be in.
+   * 
+   * @return The column that the Terminal cursor should be in.
+   */
+  private int getTerminalCursorCol()
+  {
+  	return col + bufferCursorPos + prompt.length();
   }
 
 }

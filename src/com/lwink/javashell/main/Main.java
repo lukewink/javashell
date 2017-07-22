@@ -52,5 +52,27 @@ public class Main
 	public void onInputEntered(String input, Shell shell)
 	{
 		shell.addOutput("Input received: " + input);
+		
+		int index = input.indexOf(' ');
+		if (index > 0)
+		{
+			String command = input.substring(0, index);
+			
+			String params = input.substring(index + 1);
+			
+			switch (command)
+			{
+			case "prompt":
+				changePrompt(shell, params);
+				break;
+			}
+		}
+	}
+	
+	public void changePrompt(Shell shell, String prompt)
+	{
+		LOG.info("Setting prompt to \"" + prompt + "\"");
+		shell.setPrompt(prompt);
+		
 	}
 }

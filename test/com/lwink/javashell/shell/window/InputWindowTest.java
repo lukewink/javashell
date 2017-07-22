@@ -53,15 +53,14 @@ public class InputWindowTest
 		w.addChar('b');
 		w.deleteCharBehindCursorPos();
 		w.addChar('c');
+		w.refresh();
 		verify("ac");
 	}
 
 	@Test
 	public void testAddChars()
 	{
-		w.addChar('a');
-		w.addChar('b');
-		w.addChar('c');
+		addChars("abc");
 		verify("abc");
 	}
 	
@@ -83,12 +82,35 @@ public class InputWindowTest
 		verify("", 0);
 	}
 	
+	@Test
+	public void testPrompt()
+	{
+		String prompt = "123";
+		w.setPrompt(prompt);
+		w.refresh();
+		verify("", "123       ", 3);
+		addChars("abcde");
+		verify("abcde", "123abcde  ", 8);
+		w.cursorLeft();
+		verify("abcde", "123abcde  ", 7);
+		w.cursorLeft();
+		w.cursorLeft();
+		verify("abcde", "123abcde  ", 5);
+		w.cursorRight();
+		verify("abcde", "123abcde  ", 6);
+		w.cursorRight();
+		w.cursorRight();
+		w.cursorRight();
+		verify("abcde", "123abcde  ", 8);
+	}
+	
 	public void addChars(String chars)
 	{
 		for (int i = 0; i < chars.length(); i++)
 		{
 			w.addChar(chars.charAt(i));
 		}
+		w.refresh();
 	}
 	
 	public void verify(String expected)
@@ -116,7 +138,7 @@ public class InputWindowTest
 	 */
 	public void verify(String expected, String visible, int cursorCol)
 	{
-		w.refresh();
+		//w.refresh();
 		Assert.assertEquals(expected, w.getWindowContents());
 		String termStr = terminal.getRowString(inputWindowRow);
 		String termInputWindow = termStr.substring(0, inputWindowWidth);

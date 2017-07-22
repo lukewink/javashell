@@ -113,6 +113,14 @@ public class InputOutputShell implements Shell
     this.inputCallback = Optional.ofNullable(inputCallback);
   }
   
+  @Override
+	public void setPrompt(String newPrompt)
+	{
+		inputWindow.setPrompt(newPrompt);
+		inputWindow.refresh();
+		terminal.flush();
+	}
+  
   /**
    * Called when there is input ready to be processed
    */

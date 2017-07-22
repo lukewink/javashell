@@ -52,4 +52,11 @@ public interface Shell
    * @param inputCallback callback to receive input from the user.
    */
   void registerInputCallback(InputCallback inputCallback);
+  
+  /**
+   * Set a new value to act as the input prompt.
+   * 
+   * @param newPrompt A String to set as the new input prompt.
+   */
+  void setPrompt(String newPrompt);
 }
