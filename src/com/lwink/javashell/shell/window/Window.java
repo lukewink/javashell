@@ -79,7 +79,6 @@ public class Window
   
   public void resize(int width, int height)
   {
-    System.out.println("Width: " + this.width + " -> " + width);
     if (this.width != width)
     {
       displayBuffer.resizeWidth(width);

@@ -119,7 +119,6 @@ public class SshTerminalServer implements TerminalServer
     @Override
     public Command create()
     {
-      System.out.println("Creating new command");
       return new SshShell();
     }
   }
@@ -135,7 +134,8 @@ public class SshTerminalServer implements TerminalServer
     private InputStream inputStream;
     private OutputStream outputStream;
     private SshAnsiTerminal terminal;
-    private ExitCallback exitCallback;
+    @SuppressWarnings("unused")
+		private ExitCallback exitCallback;
 
     /**
      * Called by MINA when the shell has been terminated.
