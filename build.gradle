@@ -7,28 +7,20 @@
  * user guide available at https://docs.gradle.org/3.0/userguide/tutorial_java_projects.html
  */
 
-// Apply the java plugin to add support for Java
+plugins {
+    id "com.jfrog.bintray" version "1.7.3"
+}
 apply plugin: 'java'
 apply plugin: 'eclipse'
+apply plugin: 'maven-publish'
 
-// In this section you declare where to find the dependencies of your project
 repositories {
-    // Use 'jcenter' for resolving your dependencies.
-    // You can declare any Maven/Ivy/file repository here.
     jcenter()
 }
 
-// In this section you declare the dependencies for your production and test code
 dependencies {
-    // The production code uses the SLF4J logging API at compile time
     compile 'org.slf4j:slf4j-api:1.7.21'
-    
     compile 'org.apache.sshd:sshd-core:1.3.0'
-
-    // Declare the dependency for your favourite test framework you want to use in your tests.
-    // TestNG is also supported by the Gradle Test task. Just change the
-    // testCompile dependency to testCompile 'org.testng:testng:6.8.1' and add
-    // 'test.useTestNG()' to your build script.
     testCompile 'junit:junit:4.12'
 }
 
@@ -42,5 +34,88 @@ sourceSets {
         java {
             srcDir 'test'
         }
+    }
+}
+
+// Use bintrayUpload task to upload
+// ./gradlew -PBINTRAY_KEY=xxxx bintrayUpload
+bintray {
+    user = 'lukewink'
+    key = project.hasProperty('BINTRAY_KEY') ? project.property('BINTRAY_KEY') : System.getenv('BINTRAY_KEY')
+    publications = ['MyPublication']
+    pkg {
+        repo = 'javashell'
+	name = 'javashell'
+	userOrg = 'lukewink'
+	licenses = ['Apache-2.0']
+	vcsUrl = 'https://github.com/lukewink/javashell.git'
+
+	version {
+	    name = '1.0.0'
+	    desc = 'javashell 1.0 release'
+	    released = new Date()
+	    vcsTag = '1.0.0'
+	}
+    }
+}
+
+def pomConfig = {
+    licenses {
+        license {
+	    name "The Apache Software License, Version 2.0"
+            url "http://www.apache.org/licenses/LICENSE-2.0.txt"
+            distribution "repo"
+	}
+    }
+    developers {
+        developer {
+	    id "lukewink"
+	    name "Luke Winkenbach"
+	    email "lukewink@gmail.com"
+	}
+    }
+    scm {
+        url "https://github.com/lukewink/javashell.git"
+    }
+}
+
+publishing {
+    publications {
+        MyPublication(MavenPublication) {
+	    from components.java
+	    artifact sourcesJar
+	    artifact javadocJar
+	    groupId 'com.lwink'
+	    artifactId 'javashell'
+	    version '1.0.0'
+	    pom.withXml {
+	        def root = asNode()
+		root.appendNode('description', 'A SSH shell that can be embedded in a java application')
+		root.appendNode('name', 'javashell')
+		root.appendNode('url', 'https://github.com/lukewink/javashell')
+		root.children().last() + pomConfig
+	    }
+	}
+    }
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+task printProps {
+    doLast {
+        println BINTRAY_KEY
     }
 }
