@@ -27,12 +27,14 @@ import org.apache.sshd.server.Command;
 import org.apache.sshd.server.Environment;
 import org.apache.sshd.server.ExitCallback;
 import org.apache.sshd.server.SshServer;
-import org.apache.sshd.server.auth.password.PasswordAuthenticator;
+import org.apache.sshd.server.auth.password.PasswordChangeRequiredException;
 import org.apache.sshd.server.keyprovider.AbstractGeneratorHostKeyProvider;
 import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
+import org.apache.sshd.server.session.ServerSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.lwink.javashell.server.api.Authenticator;
 import com.lwink.javashell.server.api.TerminalClosedListener;
 import com.lwink.javashell.server.api.TerminalCreatedListener;
 import com.lwink.javashell.server.api.TerminalServer;
@@ -44,15 +46,15 @@ public class SshTerminalServer implements TerminalServer
   private SshServer sshd;
   private Optional<TerminalCreatedListener> terminalCreatedListener = Optional.empty();
   private Optional<TerminalClosedListener> terminalClosedListener = Optional.empty();
-  private Optional<PasswordAuthenticator> passwordAuthenticator = Optional.empty();
   private int port;
   private File keyFile;
+  private Authenticator authenticator;
   
-  public SshTerminalServer(int port, File keyFile, PasswordAuthenticator authenticator)
+  public SshTerminalServer(int port, File keyFile, Authenticator authenticator)
   {
   	this.port = port;
   	this.keyFile = keyFile;
-  	this.passwordAuthenticator = Optional.ofNullable(authenticator);
+  	this.authenticator = authenticator;
   }
   
   @Override
@@ -70,7 +72,7 @@ public class SshTerminalServer implements TerminalServer
       sshd = SshServer.setUpDefaultServer();
       sshd.setPort(port);
       sshd.setKeyPairProvider(hostKeyProvider);
-      sshd.setPasswordAuthenticator(getPasswordAuthenticator());
+      sshd.setPasswordAuthenticator(this::authenticate);
       sshd.setShellFactory(new ShellFactory());
       sshd.start();
     }
@@ -83,9 +85,9 @@ public class SshTerminalServer implements TerminalServer
   }
   
   @Override
-  public void waitForStop() throws InterruptedException
+  public synchronized void waitForStop() throws InterruptedException
   {
-  	sshd.wait();
+  	this.wait();
   }
   
   @Override
@@ -95,7 +97,7 @@ public class SshTerminalServer implements TerminalServer
     try
     {
       sshd.stop();
-      sshd.notifyAll();
+      this.notifyAll();
     }
     catch (IOException e)
     {
@@ -103,10 +105,19 @@ public class SshTerminalServer implements TerminalServer
     }
   }
   
-  protected PasswordAuthenticator getPasswordAuthenticator()
-  {
-  	return passwordAuthenticator.orElse((user, password, server) -> true);
-  }
+  /**
+   * Authenticates a MINA SSH connection.
+   * 
+   * @param username The user attempting to connect
+   * @param password The password provided by the user
+   * @param session Information about the underlying session
+   * @return true if the connection can be authenticated.
+   * @throws PasswordChangeRequiredException To tell the user that the password must be changed.
+   */
+  protected boolean authenticate(String username, String password, ServerSession session) throws PasswordChangeRequiredException
+	{
+		return authenticator.authenticate(username, password);
+	}
   
   /**
    * Factory class to create SSH Command objects by Apache MINA.
@@ -198,5 +209,4 @@ public class SshTerminalServer implements TerminalServer
     }
     
   }
-
 }

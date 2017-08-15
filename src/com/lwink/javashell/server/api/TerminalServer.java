@@ -32,4 +32,14 @@ public interface TerminalServer
 	 * unblocked.
 	 */
   void stop();
+  
+  /**
+   * A builder to create a TerminalServer.
+   * 
+   * @return Newly created TerminalServer.
+   */
+  static TerminalServerBuilder builder()
+  {
+  	return new TerminalServerBuilder();
+  }
 }

@@ -7,7 +7,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.lwink.javashell.server.api.ServerFactory;
 import com.lwink.javashell.server.api.TerminalServer;
 import com.lwink.javashell.shell.InputOutputShell;
 import com.lwink.javashell.shell.api.Shell;
@@ -23,12 +22,15 @@ public class Main
 		m.start();
 	}
 	
-	public synchronized void start() throws Exception
+	public void start() throws Exception
 	{
-		ServerFactory factory = new ServerFactory();
-		TerminalServer server = factory.newSshServer(6667, new File("ssh-key"));
+		TerminalServer server = TerminalServer.builder()
+				.port(6667)
+				.keyFile(new File("ssh-key"))
+				.authenticator((user, password) -> user.equals("admin") && password.equals("12345"))
+				.build();
 		server.start(this::onTerminalStarted, this::onTerminalClosed);
-		this.wait();
+		server.waitForStop();
 	}
 	
 	public void onTerminalStarted(Terminal terminal)
