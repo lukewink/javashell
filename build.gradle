@@ -7,8 +7,15 @@
  * user guide available at https://docs.gradle.org/3.0/userguide/tutorial_java_projects.html
  */
 
+buildscript {
+    repositories {
+        jcenter()
+    }
+}
+
 plugins {
     id "com.jfrog.bintray" version "1.7.3"
+    id "com.jfrog.artifactory" version "4.5.1"
 }
 apply plugin: 'java'
 apply plugin: 'eclipse'
@@ -16,6 +23,7 @@ apply plugin: 'maven-publish'
 
 repositories {
     jcenter()
+    mavenCentral()
 }
 
 dependencies {
@@ -37,7 +45,7 @@ sourceSets {
     }
 }
 
-// Use bintrayUpload task to upload
+// Use bintrayUpload task to upload to bintray
 // ./gradlew -PBINTRAY_KEY=xxxx bintrayUpload
 bintray {
     user = 'lukewink'
@@ -87,7 +95,7 @@ publishing {
 	    artifact javadocJar
 	    groupId 'com.lwink'
 	    artifactId 'javashell'
-	    version '1.0.0'
+	    version '1.1.0-SNAPSHOT'
 	    pom.withXml {
 	        def root = asNode()
 		root.appendNode('description', 'A SSH shell that can be embedded in a java application')
@@ -114,8 +122,23 @@ artifacts {
     archives javadocJar
 }
 
-task printProps {
-    doLast {
-        println BINTRAY_KEY
+// Use artifactoryPublish task to upload snapshots to oss.jfrog.org
+// ./gradlew -PBINTRAY_KEY=xxxx artifactoryPublish
+artifactory {
+    contextUrl = 'http://oss.jfrog.org/artifactory'
+    publish {
+        repository {
+	    repoKey = 'oss-snapshot-local'
+	    username = 'lukewink'
+            password = project.hasProperty('BINTRAY_KEY') ? project.property('BINTRAY_KEY') : System.getenv('BINTRAY_KEY')
+	}
+	defaults {
+	    publications('MyPublication')
+	}
+    }
+    resolve {
+        repository {
+	    repoKey = 'libs-release'
+	}
     }
 }
