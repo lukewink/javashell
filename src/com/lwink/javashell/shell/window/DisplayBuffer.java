@@ -17,11 +17,43 @@ package com.lwink.javashell.shell.window;
 
 import com.lwink.javashell.terminal.api.Terminal;
 
+/**
+ * Serves as the data model for a terminal window.  The display buffer
+ * holds text as well as metadata such as color or style.  The display
+ * buffer also calculates which row text would be drawn on, therefore 
+ * the display buffer also has a width element.
+ */
 public interface DisplayBuffer
 {
+	/**
+	 * Adds text to the end of the display buffer.
+	 * 
+	 * @param text The text to add to the buffer.
+	 */
   public void addText(String text);
+  
+  /**
+   * Adds text to the end of the display buffer followed by a new line
+   * 
+   * @param text The text to add to the buffer
+   */
   public void addTextLine(String text);
+  
+  /**
+   * Changes the width of the display buffer.  This will cause the rows
+   * that text is drawn on to change.
+   * 
+   * @param newWidth The new width in columns
+   */
   public void resizeWidth(int newWidth);
+  
+  /**
+   * Draw a line of text to the terminal.
+   * 
+   * @param terminal The terminal to draw to.  This function assumes that 
+   *        the cursor is already at the correct position.
+   * @param bufferRow The row of the display buffer to draw to the terminal
+   */
   public void draw(Terminal terminal, int bufferRow);
   
   /**
