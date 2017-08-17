@@ -76,7 +76,7 @@ public class ArrayDisplayBuffer implements DisplayBuffer
   }
   
   @Override
-  public void draw(Terminal terminal, int bufferRow)
+  public void drawLine(Terminal terminal, int bufferRow)
   {
     int count = getVisibleCharsOnLine(bufferRow);
     int index = lineIndexes[bufferRow];

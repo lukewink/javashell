@@ -103,7 +103,7 @@ public class DoubleArrayDisplayBuffer implements DisplayBuffer
     addText(string + '\n');
   }
   
-  public void draw(Terminal terminal, int bufferRow)
+  public void drawLine(Terminal terminal, int bufferRow)
   {
     TermSize terminalSize = terminal.getTerminalSize();
     if (terminalSize.getColumns() != width)

@@ -105,7 +105,7 @@ public class Window
       int bufferRow = bufferStartRow + i;
       if (bufferRow >= 0)
       {
-        displayBuffer.draw(terminal, bufferRow);
+        displayBuffer.drawLine(terminal, bufferRow);
       }
       else
       {

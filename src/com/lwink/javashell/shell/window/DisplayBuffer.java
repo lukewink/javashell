@@ -54,7 +54,7 @@ public interface DisplayBuffer
    *        the cursor is already at the correct position.
    * @param bufferRow The row of the display buffer to draw to the terminal
    */
-  public void draw(Terminal terminal, int bufferRow);
+  public void drawLine(Terminal terminal, int bufferRow);
   
   /**
    * Returns the number of lines in the buffer with valid content.
