@@ -12,7 +12,7 @@ import com.lwink.javashell.shell.InputOutputShell;
 import com.lwink.javashell.shell.api.Shell;
 import com.lwink.javashell.terminal.api.Terminal;
 
-public class Main
+public class Main extends AbstractSshServer
 {
 	private static final Logger LOG = LoggerFactory.getLogger(Main.class);
 	private Map<Terminal, InputOutputShell> shellMap = new ConcurrentHashMap<>();
@@ -20,17 +20,6 @@ public class Main
 	{
 		Main m = new Main();
 		m.start();
-	}
-	
-	public void start() throws Exception
-	{
-		TerminalServer server = TerminalServer.builder()
-				.port(6667)
-				.keyFile(new File("ssh-key"))
-				.authenticator((user, password) -> user.equals("admin") && password.equals("12345"))
-				.build();
-		server.start(this::onTerminalStarted, this::onTerminalClosed);
-		server.waitForStop();
 	}
 	
 	public void onTerminalStarted(Terminal terminal)
