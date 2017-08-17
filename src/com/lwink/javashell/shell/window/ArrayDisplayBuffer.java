@@ -110,7 +110,7 @@ public class ArrayDisplayBuffer implements DisplayBuffer
    */
   protected void rollBuffer()
   {
-    int rollPoint = (int)(buffer.length * 0.5); // Roll at 10%
+    int rollPoint = (int)(buffer.length * 0.1); // Roll at 10%
     int cellIndex = 0;
     for (int i = rollPoint; i < cellCount; i++)
     {
