@@ -309,7 +309,26 @@ public class InputWindowTest
 		public void resetColorToDefaults()
 		{
 		}
-		
+
+		@Override
+		public void eraseForwards(int numChars)
+		{
+			numChars = Math.min(width - cursorCol, numChars);
+			for (int i = 0; i < numChars; i++)
+			{
+				charArray[cursorCol + i][cursorRow] = ' ';
+			}
+		}
+
+		@Override
+		public void eraseBackwards(int numChars)
+		{
+			numChars = Math.min(cursorCol + 1, numChars);
+			for (int i = 0; i < numChars; i++)
+			{
+				charArray[cursorCol - i][cursorRow] = ' ';
+			}
+		}
 	}
 
 }

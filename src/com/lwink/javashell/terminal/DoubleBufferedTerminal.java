@@ -185,4 +185,18 @@ public class DoubleBufferedTerminal implements Terminal, ResizeObserver
 	{
 		terminal.registerKeyPressReceiver(keyPressReceiver);
 	}
+
+	@Override
+	public void eraseForwards(int numChars)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void eraseBackwards(int numChars)
+	{
+		// TODO Auto-generated method stub
+		
+	}
 }

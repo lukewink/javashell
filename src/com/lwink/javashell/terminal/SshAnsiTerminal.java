@@ -278,6 +278,28 @@ public class SshAnsiTerminal implements Terminal, SignalListener
     writeBytes(bb);
   }
   
+  @Override
+  public void eraseForwards(int numChars)
+  {
+  	ByteBuffer bb = ByteBufferBuilder.create()
+        .csi()
+        .add(String.valueOf(numChars))
+        .add('X')
+        .build();
+    writeBytes(bb);
+  }
+  
+  @Override
+  public void eraseBackwards(int numChars)
+  {
+  	ByteBuffer bb = ByteBufferBuilder.create()
+        .csi()
+        .add(String.valueOf(numChars))
+        .add('P')
+        .build();
+    writeBytes(bb);
+  }
+  
   /**
    * Write bytes to the output stream.  All writes to the output stream should happen 
    * through this function as it is the only synchronized function.

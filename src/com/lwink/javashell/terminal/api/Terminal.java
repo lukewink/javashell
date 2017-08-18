@@ -103,6 +103,20 @@ public interface Terminal
   public void eraseLineWithCursor(CursorPosition where);
   
   /**
+   * Erase characters on the same row starting at the character under the cursor.
+   * 
+   * @param numChars The number of characters to erase
+   */
+  public void eraseForwards(int numChars);
+  
+  /**
+   * Erase characters starting at the character under the cursor then to the left.
+   * 
+   * @param numChars The number of characters to erase
+   */
+  public void eraseBackwards(int numChars);
+  
+  /**
    * Sets the foreground color that will be used for characters drawn in the future.
    * 
    * @param color The foreground color to be used.
