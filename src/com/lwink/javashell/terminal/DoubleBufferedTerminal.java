@@ -187,14 +187,14 @@ public class DoubleBufferedTerminal implements Terminal, ResizeObserver
 	}
 
 	@Override
-	public void eraseForwards(int numChars)
+	public void eraseCharacters(int numChars)
 	{
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void eraseBackwards(int numChars)
+	public void deleteCharacters(int numChars)
 	{
 		// TODO Auto-generated method stub
 		

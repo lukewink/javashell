@@ -279,7 +279,7 @@ public class SshAnsiTerminal implements Terminal, SignalListener
   }
   
   @Override
-  public void eraseForwards(int numChars)
+  public void eraseCharacters(int numChars)
   {
   	ByteBuffer bb = ByteBufferBuilder.create()
         .csi()
@@ -290,7 +290,7 @@ public class SshAnsiTerminal implements Terminal, SignalListener
   }
   
   @Override
-  public void eraseBackwards(int numChars)
+  public void deleteCharacters(int numChars)
   {
   	ByteBuffer bb = ByteBufferBuilder.create()
         .csi()

@@ -311,7 +311,7 @@ public class InputWindowTest
 		}
 
 		@Override
-		public void eraseForwards(int numChars)
+		public void eraseCharacters(int numChars)
 		{
 			numChars = Math.min(width - cursorCol, numChars);
 			for (int i = 0; i < numChars; i++)
@@ -321,7 +321,7 @@ public class InputWindowTest
 		}
 
 		@Override
-		public void eraseBackwards(int numChars)
+		public void deleteCharacters(int numChars)
 		{
 			numChars = Math.min(cursorCol + 1, numChars);
 			for (int i = 0; i < numChars; i++)

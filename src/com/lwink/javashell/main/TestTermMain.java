@@ -14,16 +14,17 @@ public class TestTermMain extends AbstractSshServer
 	@Override
 	public void onTerminalStarted(Terminal terminal)
 	{
+		String line = "0123456789";
 		terminal.enterPrivateMode();
 		terminal.setCursorVisible(false);
 		terminal.moveCursor(0, 0);
-		IntStream.range(0, 10).forEach(i -> terminal.putCharacter('1'));
+		IntStream.range(0, 10).forEach(i -> terminal.putCharacter(line.charAt(i)));
 		terminal.moveCursor(0, 1);
-		IntStream.range(0, 10).forEach(i -> terminal.putCharacter('2'));
+		IntStream.range(0, 10).forEach(i -> terminal.putCharacter(line.charAt(i)));
 		terminal.moveCursor(0, 2);
-		IntStream.range(0, 10).forEach(i -> terminal.putCharacter('3'));
+		IntStream.range(0, 10).forEach(i -> terminal.putCharacter(line.charAt(i)));
 		terminal.moveCursor(5, 1);
-		terminal.eraseForwards(4);
+		terminal.deleteCharacters(3);
 		terminal.flush();
 	}
 

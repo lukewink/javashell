@@ -107,14 +107,15 @@ public interface Terminal
    * 
    * @param numChars The number of characters to erase
    */
-  public void eraseForwards(int numChars);
+  public void eraseCharacters(int numChars);
   
   /**
-   * Erase characters starting at the character under the cursor then to the left.
+   * Erases characters under the cursor and shifts the remaining characters to fill the
+   * gap.  This is analogous to pressing the "Delete" button on a keyboard.
    * 
    * @param numChars The number of characters to erase
    */
-  public void eraseBackwards(int numChars);
+  public void deleteCharacters(int numChars);
   
   /**
    * Sets the foreground color that will be used for characters drawn in the future.
