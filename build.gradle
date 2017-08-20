@@ -53,34 +53,34 @@ bintray {
     publications = ['MyPublication']
     pkg {
         repo = 'javashell'
-	name = 'javashell'
-	userOrg = 'lukewink'
-	licenses = ['Apache-2.0']
-	vcsUrl = 'https://github.com/lukewink/javashell.git'
+	    name = 'javashell'
+	    userOrg = 'lukewink'
+	    licenses = ['Apache-2.0']
+	    vcsUrl = 'https://github.com/lukewink/javashell.git'
 
-	version {
-	    name = '1.0.0'
-	    desc = 'javashell 1.0 release'
-	    released = new Date()
-	    vcsTag = '1.0.0'
-	}
+	    version {
+	        name = '1.0.0'
+	        desc = 'javashell 1.0 release'
+	        released = new Date()
+	        vcsTag = '1.0.0'
+	    }
     }
 }
 
 def pomConfig = {
     licenses {
         license {
-	    name "The Apache Software License, Version 2.0"
+	        name "The Apache Software License, Version 2.0"
             url "http://www.apache.org/licenses/LICENSE-2.0.txt"
             distribution "repo"
-	}
+	    }
     }
     developers {
         developer {
-	    id "lukewink"
-	    name "Luke Winkenbach"
-	    email "lukewink@gmail.com"
-	}
+	        id "lukewink"
+	        name "Luke Winkenbach"
+	        email "lukewink@gmail.com"
+	    }
     }
     scm {
         url "https://github.com/lukewink/javashell.git"
@@ -90,20 +90,20 @@ def pomConfig = {
 publishing {
     publications {
         MyPublication(MavenPublication) {
-	    from components.java
-	    artifact sourcesJar
-	    artifact javadocJar
-	    groupId 'com.lwink'
-	    artifactId 'javashell'
-	    version '1.1.0-SNAPSHOT'
-	    pom.withXml {
-	        def root = asNode()
-		root.appendNode('description', 'A SSH shell that can be embedded in a java application')
-		root.appendNode('name', 'javashell')
-		root.appendNode('url', 'https://github.com/lukewink/javashell')
-		root.children().last() + pomConfig
+		    from components.java
+		    artifact sourcesJar
+		    artifact javadocJar
+		    groupId 'com.lwink'
+		    artifactId 'javashell'
+		    version '1.1.0-SNAPSHOT'
+		    pom.withXml {
+		        def root = asNode()
+			    root.appendNode('description', 'A SSH shell that can be embedded in a java application')
+			    root.appendNode('name', 'javashell')
+			    root.appendNode('url', 'https://github.com/lukewink/javashell')
+			    root.children().last() + pomConfig
+	        }
 	    }
-	}
     }
 }
 
@@ -128,17 +128,17 @@ artifactory {
     contextUrl = 'http://oss.jfrog.org/artifactory'
     publish {
         repository {
-	    repoKey = 'oss-snapshot-local'
-	    username = 'lukewink'
+	        repoKey = 'oss-snapshot-local'
+	        username = 'lukewink'
             password = project.hasProperty('BINTRAY_KEY') ? project.property('BINTRAY_KEY') : System.getenv('BINTRAY_KEY')
-	}
-	defaults {
-	    publications('MyPublication')
-	}
+	    }
+	    defaults {
+	        publications('MyPublication')
+	    }
     }
     resolve {
         repository {
-	    repoKey = 'libs-release'
-	}
+	        repoKey = 'libs-release'
+	    }
     }
 }
