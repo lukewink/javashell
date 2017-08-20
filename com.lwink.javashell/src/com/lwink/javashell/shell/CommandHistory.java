@@ -46,6 +46,10 @@ public class CommandHistory
   
   public String back()
   { 
+  	if (history.isEmpty())
+  	{
+  		return "";
+  	}
     if (index < history.size() - 1)
     {
       index++;
@@ -55,6 +59,10 @@ public class CommandHistory
   
   public String forward()
   {
+  	if (history.isEmpty())
+  	{
+  		return "";
+  	}
     if (index > 0)
     {
       index--;
