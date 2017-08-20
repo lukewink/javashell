@@ -1,13 +1,11 @@
 package com.lwink.javashell.main;
 
-import java.io.File;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.lwink.javashell.server.api.TerminalServer;
 import com.lwink.javashell.shell.InputOutputShell;
 import com.lwink.javashell.shell.api.Shell;
 import com.lwink.javashell.terminal.api.Terminal;
@@ -44,20 +42,29 @@ public class Main extends AbstractSshServer
 	{
 		shell.addOutput("Input received: " + input);
 		
+		String command;
+		String params;
 		int index = input.indexOf(' ');
 		if (index > 0)
 		{
-			String command = input.substring(0, index);
-			
-			String params = input.substring(index + 1);
+			command = input.substring(0, index);
+		  params = input.substring(index + 1);
+		}
+		else
+		{
+			command = input;
+		  params = null;
+		}
 			
 			switch (command)
 			{
 			case "prompt":
 				changePrompt(shell, params);
 				break;
+			case "exit":
+				shell.close();
+				break;
 			}
-		}
 	}
 	
 	public void changePrompt(Shell shell, String prompt)

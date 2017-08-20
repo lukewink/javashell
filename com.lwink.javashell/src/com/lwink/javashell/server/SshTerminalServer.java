@@ -145,7 +145,6 @@ public class SshTerminalServer implements TerminalServer
     private InputStream inputStream;
     private OutputStream outputStream;
     private SshAnsiTerminal terminal;
-    @SuppressWarnings("unused")
 		private ExitCallback exitCallback;
 
     /**
@@ -201,8 +200,11 @@ public class SshTerminalServer implements TerminalServer
      */
     @Override
     public void start(Environment env) throws IOException
-    { 
-      terminal = new SshAnsiTerminal(inputStream, outputStream, env);
+    {
+    	Runnable runOnExit = () -> {
+    		exitCallback.onExit(0, "The terminal has quit");
+    	};
+      terminal = new SshAnsiTerminal(inputStream, outputStream, env, runOnExit);
       terminal.start();
       
       terminalCreatedListener.ifPresent(l -> l.onTerminalCreated(terminal));

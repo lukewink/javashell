@@ -50,6 +50,8 @@ public class SshAnsiTerminal implements Terminal, SignalListener
   private WritableByteChannel writeChannel;
   private final TerminalInputReader inputReader;
   private Optional<KeyPressReceiver> keyPressReceiver = Optional.empty();
+  private Runnable runOnExit = () -> {};
+  private boolean running;
   
   public SshAnsiTerminal(InputStream inputStream, OutputStream outputStream, Environment sshEnv)
   {
@@ -60,8 +62,15 @@ public class SshAnsiTerminal implements Terminal, SignalListener
     this.sshEnv.addSignalListener(this, Signal.WINCH);
   }
   
+  public SshAnsiTerminal(InputStream inputStream, OutputStream outputStream, Environment sshEnv, Runnable runOnExit)
+  {
+  	this(inputStream, outputStream, sshEnv);
+  	this.runOnExit = runOnExit;
+  }
+  
   public void start()
   {
+  	this.running = true;
     inputReader.start();
   }
   
@@ -70,13 +79,13 @@ public class SshAnsiTerminal implements Terminal, SignalListener
   {
     try
     {
+    	this.running = false;
+    	runOnExit.run();
       inputReader.stop();
-      outputStream.close(); //TODO: Doesn't seem correct to close a passed in stream
-      //inputStream.close();
     }
     catch (Throwable t)
     {
-      
+      t.printStackTrace();
     }
   }
 
@@ -188,7 +197,10 @@ public class SshAnsiTerminal implements Terminal, SignalListener
   {
     try
     {
-      outputStream.flush();
+    	if (running)
+    	{
+    		outputStream.flush();
+    	}
     }
     catch (IOException e)
     {
@@ -310,7 +322,10 @@ public class SshAnsiTerminal implements Terminal, SignalListener
   {
     try
     {
-      writeChannel.write(buf);
+    	if (running)
+    	{
+    		writeChannel.write(buf);
+    	}
     } 
     catch (IOException e)
     {
