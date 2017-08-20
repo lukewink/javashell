@@ -31,12 +31,17 @@ public class CommandHistory
   
   public void add(String cmd)
   {
+  	index = -1;
+  	if (history.size() > 0 && history.get(0).equals(cmd))
+  	{
+  		// Don't add a command if it the same as the previous one
+  		return;
+  	}
     history.add(0, cmd); // Add the new command to the beginning of the history
     if (history.size() > capacity)
     {
       history.remove(history.size() - 1); // Remove the last item
     }
-    index = -1;
   }
   
   public String back()
