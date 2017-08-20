@@ -148,6 +148,7 @@ public class TerminalInputReader
         break;
       
       default:
+      	LOG.info("Received unknown terminal character: {}", (char)seq.get(2).intValue());
         receiver.onKeyPress(KeyPress.builder().type(Type.INVALID).build());
       }
       break;
