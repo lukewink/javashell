@@ -12,7 +12,7 @@ public abstract class AbstractSshServer
 		TerminalServer server = TerminalServer.builder()
 				.port(6667)
 				.keyFile(new File("ssh-key"))
-				.authenticator((user, password) -> user.equals("admin") && password.equals("12345"))
+				//.authenticator((user, password) -> user.equals("admin") && password.equals("12345"))
 				.build();
 		server.start(this::onTerminalStarted, this::onTerminalClosed);
 		server.waitForStop();
