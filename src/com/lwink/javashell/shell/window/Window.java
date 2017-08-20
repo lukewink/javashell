@@ -77,6 +77,24 @@ public class Window
     addText(text + '\n', refresh);
   }
   
+  public void scrollUp(int numRows)
+  {
+  	int rowsOfContent = displayBuffer.getNumberOfRowsWithContent();
+  	int maxScroll = Math.max(0, rowsOfContent - height);
+  	int scrollAmount = Math.min(numRows, maxScroll - scrollPosition);
+  	if (scrollAmount > 0)
+  	{
+  		scrollPosition += scrollAmount;
+  		refresh();
+  	}
+  }
+  
+  public void scrollDown(int numRows)
+  {
+  	scrollPosition = Math.max(0, scrollPosition - numRows);
+  	refresh();
+  }
+  
   public void resize(int width, int height)
   {
     if (this.width != width)
@@ -98,7 +116,8 @@ public class Window
     // larger than the number of rows in the buffer.
     int bufferStartRow = displayBuffer.getNumberOfRowsWithContent() - height;
     
-    // Go through the window line by line and draw what needs to be drawn.
+    // Go through the window line by line from the top of the window to the bottom and
+    // draw each line from the buffer.
     for (int i = 0; i < height; i++)
     {
       terminal.moveCursor(leftPosition, i + topPosition);
@@ -110,10 +129,7 @@ public class Window
       else
       {
         // No data to fill this row, so make it blank
-        for (int j = 0; j < width; j++)
-        {
-          terminal.putCharacter(' ');
-        }
+      	terminal.eraseCharacters(width);
       }
     }
     terminal.setCursorVisible(true);
