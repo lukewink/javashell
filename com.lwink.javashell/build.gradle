@@ -59,10 +59,10 @@ bintray {
 	    vcsUrl = 'https://github.com/lukewink/javashell.git'
 
 	    version {
-	        name = '1.0.0'
-	        desc = 'javashell 1.0 release'
+	        name = '1.2.0'
+	        desc = 'javashell 1.2 release'
 	        released = new Date()
-	        vcsTag = '1.0.0'
+	        vcsTag = '1.2.0'
 	    }
     }
 }
@@ -95,7 +95,7 @@ publishing {
 		    artifact javadocJar
 		    groupId 'com.lwink'
 		    artifactId 'javashell'
-		    version '1.1.0-SNAPSHOT'
+		    version '1.2.0-SNAPSHOT'
 		    pom.withXml {
 		        def root = asNode()
 			    root.appendNode('description', 'A SSH shell that can be embedded in a java application')
