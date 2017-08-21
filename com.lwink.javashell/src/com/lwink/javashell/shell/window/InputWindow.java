@@ -30,7 +30,7 @@ public class InputWindow
   /**
    * This holds the cursor position in the user input area (not including the prompt area).  So if
    * the total window with is 10 and the prompt length is 3, this variable can hold values from 
-   * 3 to 9 since those are the colums the cursor can be in.
+   * 0 to 6.
    */
   private int bufferCursorPos;
   
