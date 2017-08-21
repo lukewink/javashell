@@ -166,6 +166,7 @@ public class InputWindow
   {
     buffer.delete(0, buffer.length());
     bufferCursorPos = 0;
+    visiblePos = 0;
     return this;
   }
   
@@ -258,8 +259,8 @@ public class InputWindow
   public void moveCursorToBeginningOfLine()
   {
   	bufferCursorPos = 0;
-    resetCursorPosition();
-    terminal.flush();
+  	visiblePos = 0;
+    refresh();
   }
   
   /**
@@ -267,9 +268,10 @@ public class InputWindow
    */
   public void moveCursorToEndOfLine()
   {
-  	bufferCursorPos = buffer.length();
-    resetCursorPosition();
-    terminal.flush();
+  	int maxBufferCursorPos = width - prompt.length() - 1;
+  	bufferCursorPos = Math.min(buffer.length(), maxBufferCursorPos);
+  	visiblePos = Math.max(0, buffer.length() - bufferCursorPos);
+    refresh();
   }
   
   /**
@@ -279,7 +281,6 @@ public class InputWindow
    */
   private int getTerminalCursorCol()
   {
-  	System.out.println("Cursor pos: " + col + bufferCursorPos + prompt.length());
   	return col + bufferCursorPos + prompt.length();
   }
 
