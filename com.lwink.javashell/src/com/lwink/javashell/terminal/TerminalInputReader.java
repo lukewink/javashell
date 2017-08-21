@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
-import java.util.Vector;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -27,8 +26,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.lwink.javashell.terminal.api.KeyPress;
-import com.lwink.javashell.terminal.api.KeyPressReceiver;
 import com.lwink.javashell.terminal.api.KeyPress.Type;
+import com.lwink.javashell.terminal.api.KeyPressReceiver;
 import com.lwink.javashell.util.Preconditions;
 
 /**
@@ -41,6 +40,7 @@ public class TerminalInputReader
   private final InputStreamReader reader;
   private final Executor executor;
   private final KeyPressReceiver receiver;
+  private TermInfo termInfo;
   private boolean run = false;
   
   /**
@@ -55,6 +55,7 @@ public class TerminalInputReader
     reader = new InputStreamReader(inputStream, charset);
     executor = Executors.newSingleThreadExecutor();
     this.receiver = Preconditions.checkNotNull(receiver);
+    this.termInfo = new TermInfo(receiver);
   }
   
   /**
@@ -82,7 +83,6 @@ public class TerminalInputReader
   {
     try
     {
-      Vector<Integer> buf = new Vector<>();
       while (run)
       {
         int input = reader.read();
@@ -93,24 +93,7 @@ public class TerminalInputReader
           reader.close();
           break;  // Input stream is closed, we can exit the read thread
         }
-        if (buf.size() > 0)
-        {
-          buf.add(input);
-          checkForSequence(buf);
-        }
-        else if (input == 27) // ESCAPE
-        {
-          buf.clear();
-          buf.add(input);
-        }
-        else if (input == 127 || input == 8)
-        {
-          receiver.onKeyPress(KeyPress.builder().type(Type.BACKSPACE).build());
-        }
-        else
-        {
-          receiver.onKeyPress(KeyPress.builder().type(Type.NORMAL).ch((char)input).build());
-        }
+        termInfo.addCh((char)input);
       }
     }
     catch (IOException e)
@@ -119,43 +102,5 @@ public class TerminalInputReader
       throw new RuntimeException(e);
     }
     LOG.info("Input thread is stopping");
-  }
-  
-  protected void checkForSequence(Vector<Integer> seq)
-  {
-    Preconditions.checkArgument(seq.size() > 1 && seq.get(0) == 27);
-    switch(seq.get(1))
-    {
-    case 91: // ASCII '['.  This means we have received a CSI.
-      if (seq.size() == 2)
-      {
-        // We don't have the full sequence yet
-        return;
-      }
-      switch(seq.get(2))
-      {
-      case (int)'A':
-        receiver.onKeyPress(KeyPress.builder().type(Type.ARROW_UP).build());
-        break;
-      case (int)'B':
-        receiver.onKeyPress(KeyPress.builder().type(Type.ARROW_DOWN).build());
-        break;
-      case (int)'C':
-        receiver.onKeyPress(KeyPress.builder().type(Type.ARROW_RIGHT).build());
-        break;
-      case (int)'D': // Left Arrow
-        receiver.onKeyPress(KeyPress.builder().type(Type.ARROW_LEFT).build());
-        break;
-      
-      default:
-      	LOG.info("Received unknown terminal character: {}", (char)seq.get(2).intValue());
-        receiver.onKeyPress(KeyPress.builder().type(Type.INVALID).build());
-      }
-      break;
-    default:
-      receiver.onKeyPress(KeyPress.builder().type(Type.INVALID).build());
-    }
-
-    seq.clear();
   }
 }
