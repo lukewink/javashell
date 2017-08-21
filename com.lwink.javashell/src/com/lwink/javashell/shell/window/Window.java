@@ -62,6 +62,12 @@ public class Window
     this.displayBuffer = new ArrayDisplayBuffer(width, 10);
   }
   
+  /**
+   * Add text to the window.
+   * 
+   * @param text The next to add.
+   * @param refresh If true, the window will refresh.
+   */
   public void addText(String text, boolean refresh)
   {
     displayBuffer.addText(text);
@@ -72,15 +78,25 @@ public class Window
     }
   }
   
+  /**
+   * Add text to the window followed by a newline.
+   * 
+   * @param text The next to add.  A new line will be appended to the end.
+   * @param refresh If true, the window will refresh.
+   */
   public void addTextWithNewLine(String text, boolean refresh)
   {
     addText(text + '\n', refresh);
   }
   
+  /**
+   * Scroll the window up a specified number of rows.
+   * 
+   * @param numRows The number of rows to scroll.
+   */
   public void scrollUp(int numRows)
   {
-  	int rowsOfContent = displayBuffer.getNumberOfRowsWithContent();
-  	int maxScroll = Math.max(0, rowsOfContent - height);
+  	int maxScroll = getMaxScrollPosition();
   	int scrollAmount = Math.min(numRows, maxScroll - scrollPosition);
   	if (scrollAmount > 0)
   	{
@@ -89,12 +105,57 @@ public class Window
   	}
   }
   
+  /**
+   * Scroll the window down a specified number of rows.
+   * 
+   * @param numRows The number of rows to scroll.
+   */
   public void scrollDown(int numRows)
   {
   	scrollPosition = Math.max(0, scrollPosition - numRows);
   	refresh();
   }
   
+  /**
+   * Sets the window scroll position to a specified value.
+   * 
+   * @param newScrollPosition The position to scroll to.  Valid range is [0, getNumberOfRowsWithContent() - height].
+   *        If the parameter is outside the valid range, the scroll position will be set to the closest
+   *        valid value.
+   */
+  public void setScrollPosition(int newScrollPosition)
+  {
+  	newScrollPosition = Math.max(0, newScrollPosition);
+  	newScrollPosition = Math.min(getMaxScrollPosition(), newScrollPosition);
+  	if (this.scrollPosition != newScrollPosition)
+  	{
+  		this.scrollPosition = newScrollPosition;
+  		refresh();
+  	}
+  }
+  
+  /**
+   * Scroll the window up the height of the window.
+   */
+  public void pageUp()
+  {
+  	scrollUp(height);
+  }
+  
+  /**
+   * Scroll the window down the height of the window.
+   */
+  public void pageDown()
+  {
+  	scrollDown(height);
+  }
+  
+  /**
+   * Resize the window.
+   * 
+   * @param width The new width of the window.
+   * @param height The new height of the window.
+   */
   public void resize(int width, int height)
   {
     if (this.width != width)
@@ -106,6 +167,9 @@ public class Window
     refresh();
   }
   
+  /**
+   * Completely redraws the window.
+   */
   public void refresh()
   {
   	// First make the cursor invisible so that it's not seen while the screen is drawn
@@ -114,7 +178,7 @@ public class Window
     // bufferStartRow is the row into the display buffer that is the first to be displayed
     // at the top of the window.  Note that this can be a negative number if the window is
     // larger than the number of rows in the buffer.
-    int bufferStartRow = displayBuffer.getNumberOfRowsWithContent() - height;
+    int bufferStartRow = displayBuffer.getNumberOfRowsWithContent() - height - scrollPosition;
     
     // Go through the window line by line from the top of the window to the bottom and
     // draw each line from the buffer.
@@ -134,5 +198,15 @@ public class Window
     }
     terminal.setCursorVisible(true);
     terminal.flush();
+  }
+  
+  /**
+   * Returns the max scroll position.
+   * 
+   * @return The maximum scroll position
+   */
+  protected int getMaxScrollPosition()
+  {
+  	return Math.max(0, displayBuffer.getNumberOfRowsWithContent() - height);
   }
 }

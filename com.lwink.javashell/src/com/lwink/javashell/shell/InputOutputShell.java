@@ -132,6 +132,10 @@ public class InputOutputShell implements Shell
     {
       inputCallback.get().inputReady(input, this);
     }
+    
+    // Scroll all the way back down.
+    mainWindow.setScrollPosition(0);
+    
     inputWindow.clearWindowContents();
     inputWindow.refresh();
   }
@@ -169,22 +173,39 @@ public class InputOutputShell implements Shell
       }
       break;
     case ARROW_LEFT:
-      inputWindow.cursorLeft();
+    	if (!keyPress.shift() && !keyPress.ctrl())
+    	{
+    		inputWindow.cursorLeft();
+    	}
       break;
     case ARROW_RIGHT:
-      inputWindow.cursorRight();
+    	if (!keyPress.shift() && !keyPress.ctrl())
+    	{
+    		inputWindow.cursorRight();
+    	}
       break;
     case ARROW_UP:
+    	if (!keyPress.shift() && !keyPress.ctrl())
       {
         String s = commandHistory.back();
-        inputWindow.setText(s).refresh();;
+        inputWindow.setText(s).refresh();
       }
+    	else if (keyPress.shift() && keyPress.ctrl())
+    	{
+    		// Up one line
+    		mainWindow.scrollUp(1);
+    	}
       break;
     case ARROW_DOWN:
+    	if (!keyPress.shift() && !keyPress.ctrl())
       {
         String s = commandHistory.forward();
-        inputWindow.setText(s).refresh();;
+        inputWindow.setText(s).refresh();
       }
+    	else if (keyPress.shift() && keyPress.ctrl())
+    	{
+    		mainWindow.scrollDown(1);
+    	}
       break;
     case BACKSPACE:
       inputWindow.deleteCharBehindCursorPos().refresh();;
@@ -192,6 +213,18 @@ public class InputOutputShell implements Shell
     case EOF:
       close();
       break;
+    case PAGE_DOWN:
+    	if (keyPress.shift())
+    	{
+    		mainWindow.pageDown();
+    	}
+    	break;
+    case PAGE_UP:
+    	if (keyPress.shift())
+    	{
+    		mainWindow.pageUp();
+    	}
+    	break;
     case READ_ERROR:
       break;
     case INVALID:
@@ -200,5 +233,13 @@ public class InputOutputShell implements Shell
     default:
       break;
     }   
+  }
+  
+  protected void handleArrowKey(KeyPress keyPress)
+  {
+  	if (!keyPress.shift() && !keyPress.ctrl())
+  	{
+  		
+  	}
   }
 }

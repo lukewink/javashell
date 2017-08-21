@@ -19,11 +19,15 @@ public class KeyPress
 {
   private Type type;
   private char ch;
+  private boolean shift;
+  private boolean ctrl;
   
   public KeyPress(char c)
   {
     this.ch = c;
     this.type = Type.NORMAL;
+    this.shift = false;
+    this.ctrl = false;
   }
   
   public KeyPress(Type type)
@@ -31,10 +35,12 @@ public class KeyPress
     this.type = type;
   }
   
-  public KeyPress(Type type, char c)
+  public KeyPress(Type type, char c, boolean shift, boolean ctrl)
   {
     this.ch = c;
     this.type = type;
+    this.shift = shift;
+    this.ctrl = ctrl;
   }
   
   public char getChar()
@@ -47,9 +53,28 @@ public class KeyPress
     return type;
   }
   
+  public boolean shift()
+  {
+  	return shift;
+  }
+  
+  public boolean ctrl()
+  {
+  	return ctrl;
+  }
+  
   public static Builder builder()
   {
     return new Builder();
+  }
+  
+  public String toString()
+  {
+  	StringBuilder sb = new StringBuilder();
+  	sb.append("Type: ").append(type.toString());
+  	sb.append(" Shift: ").append(shift);
+  	sb.append(" Ctrl: ").append(ctrl);
+  	return sb.toString();
   }
   
   public enum Type
@@ -61,6 +86,8 @@ public class KeyPress
     ARROW_RIGHT,
     BACKSPACE,
     INVALID, //Used for when an invalid escape sequence has been issued
+    PAGE_UP,
+    PAGE_DOWN,
     READ_ERROR,
     EOF
   }
@@ -69,6 +96,8 @@ public class KeyPress
   {
     private char ch;
     private Type type;
+    private boolean shift = false;
+    private boolean ctrl = false;
     
     public Builder type(Type type)
     {
@@ -82,9 +111,21 @@ public class KeyPress
       return this;
     }
     
+    public Builder shift(boolean shift)
+    {
+    	this.shift = shift;
+    	return this;
+    }
+    
+    public Builder ctrl(boolean ctrl)
+    {
+    	this.ctrl = ctrl;
+    	return this;
+    }
+    
     public KeyPress build()
     {
-      return new KeyPress(type, ch);
+      return new KeyPress(type, ch, shift, ctrl);
     }
   }
 }
