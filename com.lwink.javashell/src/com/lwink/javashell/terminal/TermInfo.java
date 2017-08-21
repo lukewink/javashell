@@ -109,8 +109,12 @@ public class TermInfo
 	{
 		for (int i = 1; i <= 26; i++)
 		{
-			known.put(String.valueOf((char)i), KeyPress.builder().ch((char)(i + 96)).type(Type.CONTROL).ctrl(true).build());
-			known.put(String.valueOf((char)(i + 128)), KeyPress.builder().ch((char)(i + 96)).type(Type.NORMAL).shift(true).ctrl(true).build());
+			// Don't create entries for 10 and 13 because that would overwrite /n and /r respectively
+			if (i != 10 && i != 13)
+			{
+				known.put(String.valueOf((char)i), KeyPress.builder().ch((char)(i + 96)).type(Type.CONTROL).ctrl(true).build());
+				known.put(String.valueOf((char)(i + 128)), KeyPress.builder().ch((char)(i + 96)).type(Type.NORMAL).shift(true).ctrl(true).build());
+			}
 		}
 	}
 }
