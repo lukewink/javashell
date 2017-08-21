@@ -22,12 +22,28 @@ import com.lwink.javashell.terminal.api.Terminal;
 
 public class InputWindow
 {
+	/**
+	 * The buffer which holds the user's input.
+	 */
   private StringBuilder buffer;
+  
+  /**
+   * This holds the cursor position in the user input area (not including the prompt area).  So if
+   * the total window with is 10 and the prompt length is 3, this variable can hold values from 
+   * 3 to 9 since those are the colums the cursor can be in.
+   */
   private int bufferCursorPos;
+  
+  /**
+   * This contains how many characters the view is scrolled to the right.  So if the total window
+   * width is 6 (and there is no prompt), and the user inputs 6 characters, this value would be 1
+   * since the window would need to be scrolled one to the right for the cursor to be on the spot
+   * where the next character would go.
+   */
   private int visiblePos;
-  private int width;
-  private int row;
-  private int col;
+  private int width; /** Window width */
+  private int row; /** The terminal row that the window resides on */
+  private int col; /** How many columns from the left the window is positioned */
   private Terminal terminal;
   private String prompt;
   
@@ -86,7 +102,7 @@ public class InputWindow
       return;
     }
     
-    if (bufferCursorPos + 1 == width)
+    if (prompt.length() + bufferCursorPos + 1 == width)
     {
       // The cursor is already in the last cell, so we need to "scroll" to the right
       visiblePos++;
@@ -263,7 +279,8 @@ public class InputWindow
    */
   private int getTerminalCursorCol()
   {
-  	return col + bufferCursorPos + prompt.length() - visiblePos;
+  	System.out.println("Cursor pos: " + col + bufferCursorPos + prompt.length());
+  	return col + bufferCursorPos + prompt.length();
   }
 
 }
