@@ -43,7 +43,7 @@ public class TermInfo
 		if (keyPress != null)
 		{
 			buffer.setLength(0);
-			LOG.info("KeyPress {}", keyPress);
+			LOG.debug("KeyPress {}", keyPress);
 			receiver.onKeyPress(keyPress);
 		}
 		else
@@ -59,6 +59,7 @@ public class TermInfo
 	private static void load()
 	{
 		loadAscii();
+		loadControl();
 		
 		// Arrow keys
 		known.put("\u001b[A", KeyPress.builder().type(Type.ARROW_UP).build());
@@ -102,5 +103,14 @@ public class TermInfo
 		
 		known.put("\n", KeyPress.builder().ch('\n').type(Type.NORMAL).build());
 		known.put("\r", KeyPress.builder().ch('\r').type(Type.NORMAL).build());
+	}
+	
+	private static void loadControl()
+	{
+		for (int i = 1; i <= 26; i++)
+		{
+			known.put(String.valueOf((char)i), KeyPress.builder().ch((char)(i + 96)).type(Type.CONTROL).ctrl(true).build());
+			known.put(String.valueOf((char)(i + 128)), KeyPress.builder().ch((char)(i + 96)).type(Type.NORMAL).shift(true).ctrl(true).build());
+		}
 	}
 }

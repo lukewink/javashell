@@ -210,6 +210,9 @@ public class InputOutputShell implements Shell
     case BACKSPACE:
       inputWindow.deleteCharBehindCursorPos().refresh();;
       break;
+    case CONTROL:
+    	handleControl(keyPress);
+    	break;
     case EOF:
       close();
       break;
@@ -235,11 +238,19 @@ public class InputOutputShell implements Shell
     }   
   }
   
-  protected void handleArrowKey(KeyPress keyPress)
+  protected void handleControl(KeyPress keyPress)
   {
-  	if (!keyPress.shift() && !keyPress.ctrl())
+  	if (!keyPress.shift() && keyPress.ctrl())
   	{
-  		
+  		switch (keyPress.getChar())
+  		{
+  		case 'a':
+  			inputWindow.moveCursorToBeginningOfLine();
+  			break;
+  		case 'e':
+  			inputWindow.moveCursorToEndOfLine();
+  			break;
+  		}
   	}
   }
 }

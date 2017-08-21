@@ -43,6 +43,11 @@ public class InputWindow
     prompt = "";
   }
   
+  /**
+   * Sets the prompt.  The window must be refreshed for the change to take effect.
+   * 
+   * @param prompt The new prompt string
+   */
   public void setPrompt(String prompt)
   {
   	this.prompt = prompt;
@@ -148,6 +153,12 @@ public class InputWindow
     return this;
   }
   
+  /**
+   * Delete the character behind the current cursor position and shift all characters after
+   * the deleted character to the left.
+   * 
+   * @return This InputWindow
+   */
   public InputWindow deleteCharBehindCursorPos()
   {
     int deletePos = bufferCursorPos + visiblePos - 1; // -1 because we delete the character behind the cursor
@@ -226,13 +237,33 @@ public class InputWindow
   }
   
   /**
+   * Moves the cursor to the beginning of the line.
+   */
+  public void moveCursorToBeginningOfLine()
+  {
+  	bufferCursorPos = 0;
+    resetCursorPosition();
+    terminal.flush();
+  }
+  
+  /**
+   * Moves cursor to the end of the line
+   */
+  public void moveCursorToEndOfLine()
+  {
+  	bufferCursorPos = buffer.length();
+    resetCursorPosition();
+    terminal.flush();
+  }
+  
+  /**
    * Gets column that the Terminal cursor should be in.
    * 
    * @return The column that the Terminal cursor should be in.
    */
   private int getTerminalCursorCol()
   {
-  	return col + bufferCursorPos + prompt.length();
+  	return col + bufferCursorPos + prompt.length() - visiblePos;
   }
 
 }

@@ -85,6 +85,7 @@ public class KeyPress
     ARROW_LEFT,
     ARROW_RIGHT,
     BACKSPACE,
+    CONTROL,
     INVALID, //Used for when an invalid escape sequence has been issued
     PAGE_UP,
     PAGE_DOWN,
