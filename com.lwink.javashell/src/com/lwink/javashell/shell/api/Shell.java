@@ -24,7 +24,7 @@ public interface Shell
   
   /**
    * Adds text to the output window of the shell.  This function is equivalent to calling
-   * {@link #addOutput(String, boolean)} passing true as the newline and refresh parameters.
+   * {@link #addOutput(String, boolean, boolean)} passing true as the newline and refresh parameters.
    * 
    * @param string The text to add to the window.
    */
@@ -38,12 +38,12 @@ public interface Shell
    * @param refresh true to refresh the output window.  If false, the text will be added to the 
    *        internal buffer, but the window contents will not be updated.
    */
-  void addOutput(String string, boolean addNewline, boolean refresh);
+  void addOutput(String string, boolean addNewLine, boolean refresh);
   
   /**
    * Redraw the contents of the main output window.  In general, it's probably not necessary to call
-   * this function since the {@link #addOutput(String, boolean)} functions allows the caller to specify
-   * whether to refresh there.
+   * this function since the {@link #addOutput(String, boolean, boolean)} functions allows the caller
+   * to specify whether to refresh there.
    */
   void refresh();
   

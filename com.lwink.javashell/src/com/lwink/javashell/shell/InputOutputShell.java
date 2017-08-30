@@ -90,9 +90,9 @@ public class InputOutputShell implements Shell
   }
   
   @Override
-  public void addOutput(String string, boolean newLine, boolean refresh)
+  public void addOutput(String string, boolean addNewLine, boolean refresh)
   {
-  	BiConsumer<String, Boolean> addText = newLine ? mainWindow::addTextWithNewLine : mainWindow::addText;
+  	BiConsumer<String, Boolean> addText = addNewLine ? mainWindow::addTextWithNewLine : mainWindow::addText;
     addText.accept(string, false); // Don't refresh here.  We will do so below if needed.
     inputWindow.resetCursorPosition();
     if (refresh)
@@ -158,6 +158,8 @@ public class InputOutputShell implements Shell
 
   /**
    * Called by the Terminal when a key press has been received.
+   * 
+   * @param keyPress Information on the key that was pressed
    */
   protected void onKeyPress(KeyPress keyPress)
   {
