@@ -16,6 +16,7 @@
 package com.lwink.javashell.shell;
 
 import java.util.Optional;
+import java.util.function.BiConsumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,13 +86,14 @@ public class InputOutputShell implements Shell
   @Override
   public void addOutput(String string)
   {
-    addOutput(string, true);
+    addOutput(string, true, true);
   }
   
   @Override
-  public void addOutput(String string, boolean refresh)
+  public void addOutput(String string, boolean newLine, boolean refresh)
   {
-    mainWindow.addTextWithNewLine(string, false);
+  	BiConsumer<String, Boolean> addText = newLine ? mainWindow::addTextWithNewLine : mainWindow::addText;
+    addText.accept(string, false); // Don't refresh here.  We will do so below if needed.
     inputWindow.resetCursorPosition();
     if (refresh)
     {

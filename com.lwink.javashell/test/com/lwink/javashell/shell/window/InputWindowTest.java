@@ -5,13 +5,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.lwink.javashell.terminal.api.CursorPosition;
-import com.lwink.javashell.terminal.api.KeyPressReceiver;
-import com.lwink.javashell.terminal.api.ResizeObserver;
-import com.lwink.javashell.terminal.api.TermColor;
-import com.lwink.javashell.terminal.api.TermSize;
-import com.lwink.javashell.terminal.api.Terminal;
-
 public class InputWindowTest
 {
 	TestTerminal terminal;

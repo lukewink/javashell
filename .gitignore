@@ -4,3 +4,4 @@ build/
 .classpath
 .project
 ssh-key
+.settings/
