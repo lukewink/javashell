@@ -63,18 +63,22 @@ public class TermInfo
 		
 		// Arrow keys
 		known.put("\u001b[A", KeyPress.builder().type(Type.ARROW_UP).build());
+		known.put("\u001bOA", KeyPress.builder().type(Type.ARROW_UP).build());
 		known.put("\u001b[1;2A", KeyPress.builder().type(Type.ARROW_UP).shift(true).build());
 		known.put("\u001b[1;5A", KeyPress.builder().type(Type.ARROW_UP).ctrl(true).build());
 		known.put("\u001b[1;6A", KeyPress.builder().type(Type.ARROW_UP).shift(true).ctrl(true).build());
 		known.put("\u001b[B", KeyPress.builder().type(Type.ARROW_DOWN).build());
+		known.put("\u001bOB", KeyPress.builder().type(Type.ARROW_DOWN).build());
 		known.put("\u001b[1;2B", KeyPress.builder().type(Type.ARROW_DOWN).shift(true).build());
 		known.put("\u001b[1;5B", KeyPress.builder().type(Type.ARROW_DOWN).ctrl(true).build());
 		known.put("\u001b[1;6B", KeyPress.builder().type(Type.ARROW_DOWN).shift(true).ctrl(true).build());
 		known.put("\u001b[C", KeyPress.builder().type(Type.ARROW_RIGHT).build());
+		known.put("\u001bOC", KeyPress.builder().type(Type.ARROW_RIGHT).build());
 		known.put("\u001b[1;2C", KeyPress.builder().type(Type.ARROW_RIGHT).shift(true).build());
 		known.put("\u001b[1;5C", KeyPress.builder().type(Type.ARROW_RIGHT).ctrl(true).build());
 		known.put("\u001b[1;6C", KeyPress.builder().type(Type.ARROW_RIGHT).shift(true).ctrl(true).build());
 		known.put("\u001b[D", KeyPress.builder().type(Type.ARROW_LEFT).build());
+		known.put("\u001bOD", KeyPress.builder().type(Type.ARROW_LEFT).build());
 		known.put("\u001b[1;2D", KeyPress.builder().type(Type.ARROW_LEFT).shift(true).build());
 		known.put("\u001b[1;5D", KeyPress.builder().type(Type.ARROW_LEFT).ctrl(true).build());
 		known.put("\u001b[1;6D", KeyPress.builder().type(Type.ARROW_LEFT).shift(true).ctrl(true).build());

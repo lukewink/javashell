@@ -42,7 +42,7 @@ public class ArrayDisplayBuffer implements DisplayBuffer
   {
     this.buffer = new int[100000];
     this.cellCount = 0;
-    this.lineIndexes = new int[2];
+    this.lineIndexes = new int[100];
     this.lineInsertIndex = 0;
     this.width = width;
   }

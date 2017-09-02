@@ -221,16 +221,10 @@ public class InputOutputShell implements Shell
       close();
       break;
     case PAGE_DOWN:
-    	if (keyPress.shift())
-    	{
-    		mainWindow.pageDown();
-    	}
+      mainWindow.pageDown();
     	break;
     case PAGE_UP:
-    	if (keyPress.shift())
-    	{
-    		mainWindow.pageUp();
-    	}
+      mainWindow.pageUp();
     	break;
     case READ_ERROR:
       break;
