@@ -218,6 +218,7 @@ public class InputWindow
    */
   public void refresh()
   {
+  	terminal.resetColorToDefaults();
     terminal.setCursorVisible(false);
     terminal.moveCursor(col, row);
     

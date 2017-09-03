@@ -52,6 +52,8 @@ public class SshAnsiTerminal implements Terminal, SignalListener
   private Optional<KeyPressReceiver> keyPressReceiver = Optional.empty();
   private Runnable runOnExit = () -> {};
   private boolean running;
+  private TermColor fgColor = TermColor.DEFAULT;
+  private TermColor bgColor = TermColor.DEFAULT;
   
   public SshAnsiTerminal(InputStream inputStream, OutputStream outputStream, Environment sshEnv)
   {
@@ -218,23 +220,31 @@ public class SshAnsiTerminal implements Terminal, SignalListener
   @Override
   public void setForegroundColor(TermColor color)
   {
-    ByteBuffer bb = ByteBufferBuilder.create()
-        .csi()
-        .add(String.valueOf(color.getColor() + 30))
-        .add('m')
-        .build();
-    writeBytes(bb);
+  	if (fgColor != color)
+  	{
+	    ByteBuffer bb = ByteBufferBuilder.create()
+	        .csi()
+	        .add(String.valueOf(color.getColor() + 30))
+	        .add('m')
+	        .build();
+	    writeBytes(bb);
+	    fgColor = color;
+  	}
   }
 
   @Override
   public void setBackgroundColor(TermColor color)
   {
-    ByteBuffer bb = ByteBufferBuilder.create()
-        .csi()
-        .add(String.valueOf(color.getColor() + 40))
-        .add('m')
-        .build();
-    writeBytes(bb);
+  	if (bgColor != color)
+  	{
+	    ByteBuffer bb = ByteBufferBuilder.create()
+	        .csi()
+	        .add(String.valueOf(color.getColor() + 40))
+	        .add('m')
+	        .build();
+	    writeBytes(bb);
+	    bgColor = color;
+  	}
   }
 
   @Override
@@ -251,6 +261,8 @@ public class SshAnsiTerminal implements Terminal, SignalListener
   @Override
   public void resetColorToDefaults()
   {
+  	fgColor = TermColor.DEFAULT;
+  	bgColor = TermColor.DEFAULT;
     ByteBuffer bb = ByteBufferBuilder.create()
         .csi()
         .add("39;49m")
@@ -293,23 +305,29 @@ public class SshAnsiTerminal implements Terminal, SignalListener
   @Override
   public void eraseCharacters(int numChars)
   {
-  	ByteBuffer bb = ByteBufferBuilder.create()
-        .csi()
-        .add(String.valueOf(numChars))
-        .add('X')
-        .build();
-    writeBytes(bb);
+  	if (numChars > 0)
+  	{
+	  	ByteBuffer bb = ByteBufferBuilder.create()
+	        .csi()
+	        .add(String.valueOf(numChars))
+	        .add('X')
+	        .build();
+	    writeBytes(bb);
+  	}
   }
   
   @Override
   public void deleteCharacters(int numChars)
   {
-  	ByteBuffer bb = ByteBufferBuilder.create()
-        .csi()
-        .add(String.valueOf(numChars))
-        .add('P')
-        .build();
-    writeBytes(bb);
+  	if (numChars > 0)
+  	{
+	  	ByteBuffer bb = ByteBufferBuilder.create()
+	        .csi()
+	        .add(String.valueOf(numChars))
+	        .add('P')
+	        .build();
+	    writeBytes(bb);
+  	}
   }
   
   /**

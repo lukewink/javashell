@@ -16,13 +16,13 @@
 package com.lwink.javashell.shell;
 
 import java.util.Optional;
-import java.util.function.BiConsumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.lwink.javashell.shell.api.InputCallback;
 import com.lwink.javashell.shell.api.Shell;
+import com.lwink.javashell.shell.api.TextAttributes;
 import com.lwink.javashell.shell.window.InputWindow;
 import com.lwink.javashell.shell.window.Window;
 import com.lwink.javashell.terminal.api.KeyPress;
@@ -84,16 +84,19 @@ public class InputOutputShell implements Shell
   }
   
   @Override
-  public void addOutput(String string)
+  public void addOutput(String string, TextAttributes attributes)
   {
-    addOutput(string, true, true);
+    addOutput(string, attributes, true, true);
   }
   
   @Override
-  public void addOutput(String string, boolean addNewLine, boolean refresh)
+  public void addOutput(String string, TextAttributes attributes, boolean addNewLine, boolean refresh)
   {
-  	BiConsumer<String, Boolean> addText = addNewLine ? mainWindow::addTextWithNewLine : mainWindow::addText;
-    addText.accept(string, false); // Don't refresh here.  We will do so below if needed.
+  	if (addNewLine)
+  	{
+  		string += '\n';
+  	}
+    mainWindow.addText(string, attributes, false); // Don't refresh here.  We will do so below if needed.
     inputWindow.resetCursorPosition();
     if (refresh)
     {

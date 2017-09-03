@@ -24,11 +24,24 @@ public interface Shell
   
   /**
    * Adds text to the output window of the shell.  This function is equivalent to calling
-   * {@link #addOutput(String, boolean, boolean)} passing true as the newline and refresh parameters.
+   * {@link #addOutput(String, TextAttributes, boolean, boolean)} passing true as the newline and refresh parameters.
    * 
    * @param string The text to add to the window.
    */
-  void addOutput(String string);
+  default void addOutput(String string)
+  {
+  	addOutput(string, null);
+  }
+  
+  /**
+   * Adds text to the output window of the shell.  This function is equivalent to calling
+   * {@link #addOutput(String, TextAttributes, boolean, boolean)} passing true as the newline and refresh parameters.
+   * 
+   * @param string The text to add to the window.
+   * @param attributes The attributes to associate with the added text.  If null, then default attributes
+   *        will be used.
+   */
+  void addOutput(String string, TextAttributes attributes);
   
   /**
    * Adds text to the output window of the shell.
@@ -38,7 +51,22 @@ public interface Shell
    * @param refresh true to refresh the output window.  If false, the text will be added to the 
    *        internal buffer, but the window contents will not be updated.
    */
-  void addOutput(String string, boolean addNewLine, boolean refresh);
+  default void addOutput(String string, boolean addNewLine, boolean refresh)
+  {
+  	addOutput(string, null, addNewLine, refresh);
+  }
+  
+  /**
+   * Adds text to the output window of the shell.
+   * 
+   * @param string The text to add to the window.
+   * @param attributes The attributes to associate with the added text. If null, then default attributes
+   *        will be used.
+   * @param addNewLine Whether to add a new line to the end of the input
+   * @param refresh true to refresh the output window.  If false, the text will be added to the 
+   *        internal buffer, but the window contents will not be updated.
+   */
+  void addOutput(String string, TextAttributes attributes, boolean addNewLine, boolean refresh);
   
   /**
    * Redraw the contents of the main output window.  In general, it's probably not necessary to call

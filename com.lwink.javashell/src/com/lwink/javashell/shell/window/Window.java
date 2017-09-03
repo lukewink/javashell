@@ -15,6 +15,7 @@
  **/
 package com.lwink.javashell.shell.window;
 
+import com.lwink.javashell.shell.api.TextAttributes;
 import com.lwink.javashell.terminal.api.Terminal;
 
 public class Window
@@ -66,11 +67,12 @@ public class Window
    * Add text to the window.
    * 
    * @param text The next to add.
+   * @param attributes The attributes to associate with the text.
    * @param refresh If true, the window will refresh.
    */
-  public void addText(String text, boolean refresh)
+  public void addText(String text, TextAttributes attributes, boolean refresh)
   {
-    displayBuffer.addText(text);
+    displayBuffer.addText(text, attributes);
     if (scrollPosition == 0 && refresh)
     {
       // Redraw the window only if we are not scrolled.
@@ -82,11 +84,12 @@ public class Window
    * Add text to the window followed by a newline.
    * 
    * @param text The next to add.  A new line will be appended to the end.
+   * @param attributes The attributes to associate with the text.
    * @param refresh If true, the window will refresh.
    */
-  public void addTextWithNewLine(String text, boolean refresh)
+  public void addTextWithNewLine(String text, TextAttributes attributes, boolean refresh)
   {
-    addText(text + '\n', refresh);
+    addText(text + '\n', attributes, refresh);
   }
   
   /**

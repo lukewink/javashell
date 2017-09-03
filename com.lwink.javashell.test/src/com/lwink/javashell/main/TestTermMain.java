@@ -15,6 +15,7 @@ public class TestTermMain extends AbstractSshServer
 	public void onTerminalStarted(Terminal terminal)
 	{
 		String line = "0123456789";
+		terminal.clearScreen();
 		terminal.enterPrivateMode();
 		terminal.setCursorVisible(false);
 		terminal.moveCursor(0, 0);
@@ -24,7 +25,7 @@ public class TestTermMain extends AbstractSshServer
 		terminal.moveCursor(0, 2);
 		IntStream.range(0, 10).forEach(i -> terminal.putCharacter(line.charAt(i)));
 		terminal.moveCursor(5, 1);
-		terminal.deleteCharacters(3);
+		terminal.eraseCharacters(0);
 		terminal.flush();
 	}
 

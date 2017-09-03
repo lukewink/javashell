@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Luke Winkenbach
+ * Copyright 2017 Luke Winkenbach
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,27 +15,24 @@
  **/
 package com.lwink.javashell.terminal.api;
 
-public enum TermColor
+public enum TextStyle
 {
-  BLACK(0),
-  RED(1),
-  GREEN(2),
-  YELLOW(3),
-  BLUE(4),
-  MAGENTA(5),
-  CYAN(6),
-  WHITE(7),
-  DEFAULT(9);
-  
-  private int color;
-  
-  TermColor(int color)
-  {
-    this.color = color;
-  }
-  
-  public int getColor()
-  {
-    return color;
-  }
+	NORMAL(0),
+	BOLD(1),
+	UNDERLINED(4),
+	BLINK(5),
+	INVERSE(7),
+	INVISIBLE(8);
+	
+	private int termValue;
+	
+	TextStyle(int termValue)
+	{
+		this.termValue = termValue;
+	}
+	
+	public int getTermValue()
+	{
+		return termValue;
+	}
 }

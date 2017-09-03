@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 
 import com.lwink.javashell.shell.InputOutputShell;
 import com.lwink.javashell.shell.api.Shell;
+import com.lwink.javashell.shell.api.TextAttributes;
+import com.lwink.javashell.terminal.api.TermColor;
 import com.lwink.javashell.terminal.api.Terminal;
 
 public class Main extends AbstractSshServer
@@ -40,7 +42,11 @@ public class Main extends AbstractSshServer
 	
 	public void onInputEntered(String input, Shell shell)
 	{
-		shell.addOutput("Input received: " + input);
+		TextAttributes ta = new TextAttributes();
+		ta.setBgColor(TermColor.RED);
+		ta.setFgColor(TermColor.GREEN);
+		shell.addOutput("Input received: ", ta, false, false);
+		shell.addOutput(input);
 		
 		String command;
 		String params;

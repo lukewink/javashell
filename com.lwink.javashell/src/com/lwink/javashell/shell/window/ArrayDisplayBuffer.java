@@ -15,6 +15,8 @@
  **/
 package com.lwink.javashell.shell.window;
 
+import com.lwink.javashell.shell.api.TextAttributes;
+import com.lwink.javashell.terminal.api.TermColor;
 import com.lwink.javashell.terminal.api.Terminal;
 
 /**
@@ -25,9 +27,10 @@ import com.lwink.javashell.terminal.api.Terminal;
  * things up a lot.
  * 
  * Cell format is as follows:
- * [xxxxxxxxxCCCCCCCCTTTTTTTTTTTTTTTT]
+ * [xxxxxxBBBBBFFFFFTTTTTTTTTTTTTTTT]
  * x = Not used.
- * C = Color bits
+ * F = Foreground color bits
+ * B = Background color bits
  * T = Character bits
  */
 public class ArrayDisplayBuffer implements DisplayBuffer
@@ -48,7 +51,7 @@ public class ArrayDisplayBuffer implements DisplayBuffer
   }
   
   @Override
-  public void addText(String text)
+  public void addText(String text, TextAttributes attributes)
   {
     if (cellCount + text.length() > buffer.length)
     {
@@ -62,17 +65,20 @@ public class ArrayDisplayBuffer implements DisplayBuffer
         text = text.substring(0, buffer.length - cellCount);
       }
     }
+    
+    int cellAttributes = attributes != null  ? getCellAttributes(attributes) : 0;
+    
     // Add the characters to the buffer
-    text.chars().forEach(c -> buffer[cellCount++] = c);
+    text.chars().forEach(c -> buffer[cellCount++] = c | cellAttributes);
     
     // Recalulate the line indexes starting at the current line
     recalcualteLineIndexes(width, lineInsertIndex);
   }
   
   @Override
-  public void addTextLine(String text)
+  public void addTextLine(String text, TextAttributes attributes)
   {
-    addText(text + '\n');
+    addText(text + '\n', attributes);
   }
   
   @Override
@@ -80,19 +86,30 @@ public class ArrayDisplayBuffer implements DisplayBuffer
   {
     int count = getVisibleCharsOnLine(bufferRow);
     int index = lineIndexes[bufferRow];
-
+    int fgColor = -1;  // Default to something impossible
+    int bgColor = -1;
+    
     for (int i = 0; i < count; i++)
     {
       int cell = buffer[index++];
       char c = (char)(cell & 0xFF);
       if (c == (char)0)
         c = ' ';
+      int newFgColor = (cell & 0x001F0000) >> 16;
+    	int newBgColor = (cell & 0x03E00000) >> 21;
+      if (fgColor != newFgColor)
+      {
+      	terminal.setForegroundColor(toTermColor(newFgColor));
+      	fgColor = newFgColor;
+      }
+      if (bgColor != newBgColor)
+      {
+      	terminal.setBackgroundColor(toTermColor(newBgColor));
+      	bgColor = newBgColor;
+      }
       terminal.putCharacter(c);
     }
-    for (int i = count; i < width; i++)
-    {
-      terminal.putCharacter(' ');
-    }
+    terminal.eraseCharacters(width - count);
   }
   
   @Override
@@ -163,7 +180,7 @@ public class ArrayDisplayBuffer implements DisplayBuffer
   public int getNumberOfRowsWithContent()
   {
     // If the current line is empty, then we don't want to count it.
-    if (lineIndexes[lineInsertIndex] == cellCount)
+    if (lineIndexes[lineInsertIndex] == cellCount - 1)
     {
       return lineInsertIndex;
     }
@@ -230,5 +247,83 @@ public class ArrayDisplayBuffer implements DisplayBuffer
       newLineIndexes[i] = lineIndexes[i];
     }
     lineIndexes = newLineIndexes;
+  }
+  
+  /**
+   * Convert color codes in the display buffer cells to TermColor enumeration values.
+   * 
+   * @param color Integer value of color codes in display buffer.
+   * @return Corresponding TermColor.
+   */
+  private TermColor toTermColor(int color)
+  {
+  	// The color values do not match the ANSI escape code values.  This is because I wanted
+  	// 0 to be the default color.
+  	switch (color)
+  	{
+  	case 1:
+  		return TermColor.BLACK;
+  	case 2:
+  		return TermColor.RED;
+  	case 3:
+  		return TermColor.GREEN;
+  	case 4:
+  		return TermColor.YELLOW;
+  	case 5:
+  		return TermColor.BLUE;
+  	case 6:
+  		return TermColor.MAGENTA;
+  	case 7:
+  	  return TermColor.CYAN;
+  	case 8:
+  		return TermColor.WHITE;
+  	}
+  	return TermColor.DEFAULT;
+  }
+  
+  /**
+   * Converts a TermColor to the value used to represent that color in the buffer.  This is the opposite function as
+   * {@link #toTermColor(int)}.
+   * 
+   * @param color Color to convert.
+   * @return Integer value to store in array buffer.
+   */
+  private int toBufferColor(TermColor color)
+  {
+  	switch (color)
+  	{
+  	case BLACK:
+  		return 1;
+  	case RED:
+  		return 2;
+  	case GREEN:
+  		return 3;
+  	case YELLOW:
+  		return 4;
+  	case BLUE:
+  		return 5;
+  	case MAGENTA:
+  		return 6;
+  	case CYAN:
+  		return 7;
+  	case WHITE:
+  		return 8;
+  	default:
+  		return 0;
+  	}
+  }
+  
+  private int getCellAttributes(TextAttributes attributes)
+  {
+  	int cellAttributes = 0;
+  	int fgPart = toBufferColor(attributes.getFgColor());
+  	int bgPart = toBufferColor(attributes.getBgColor());
+  	
+  	// See the comments for this class to understand why the following shifting
+  	// takes place.
+  	cellAttributes |= (fgPart << 16);
+  	cellAttributes |= (bgPart << 21);
+  	
+  	return cellAttributes;
   }
 }

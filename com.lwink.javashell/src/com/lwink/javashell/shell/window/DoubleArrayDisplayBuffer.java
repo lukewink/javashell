@@ -15,6 +15,7 @@
  **/
 package com.lwink.javashell.shell.window;
 
+import com.lwink.javashell.shell.api.TextAttributes;
 import com.lwink.javashell.terminal.api.TermSize;
 import com.lwink.javashell.terminal.api.Terminal;
 
@@ -74,7 +75,7 @@ public class DoubleArrayDisplayBuffer implements DisplayBuffer
   }
   
   
-  public void addText(String string)
+  public void addText(String string, TextAttributes attributes)
   {
     for (int i = 0; i < string.length(); i++)
     {
@@ -98,9 +99,9 @@ public class DoubleArrayDisplayBuffer implements DisplayBuffer
     }
   }
   
-  public void addTextLine(String string)
+  public void addTextLine(String string, TextAttributes attributes)
   {
-    addText(string + '\n');
+    addText(string + '\n', attributes);
   }
   
   public void drawLine(Terminal terminal, int bufferRow)

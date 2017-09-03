@@ -15,6 +15,7 @@
  **/
 package com.lwink.javashell.shell.window;
 
+import com.lwink.javashell.shell.api.TextAttributes;
 import com.lwink.javashell.terminal.api.Terminal;
 
 /**
@@ -29,15 +30,17 @@ public interface DisplayBuffer
 	 * Adds text to the end of the display buffer.
 	 * 
 	 * @param text The text to add to the buffer.
+	 * @param attributes Attributes of the text being added
 	 */
-  public void addText(String text);
+  public void addText(String text, TextAttributes attributes);
   
   /**
    * Adds text to the end of the display buffer followed by a new line
    * 
    * @param text The text to add to the buffer
+   * @param attributes Attributes of the text being added
    */
-  public void addTextLine(String text);
+  public void addTextLine(String text, TextAttributes attributes);
   
   /**
    * Changes the width of the display buffer.  This will cause the rows
