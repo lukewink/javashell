@@ -1,0 +1,28 @@
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+
+    repositories {
+        jcenter()
+        mavenCentral()
+    }
+
+    sourceSets {
+        main {
+            java {
+                srcDir 'src'
+            }
+        }
+        test {
+            java {
+                srcDir 'test'
+            }
+        }
+    }
+}

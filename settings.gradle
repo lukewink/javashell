@@ -1,0 +1,4 @@
+include 'com.lwink.javashell'
+include 'com.lwink.javashell.test'
+
+rootProject.name = 'javashell'

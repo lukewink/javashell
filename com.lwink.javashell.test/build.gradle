@@ -7,29 +7,10 @@
  * user guide available at https://docs.gradle.org/3.0/userguide/tutorial_java_projects.html
  */
 
-apply plugin: 'java'
-apply plugin: 'eclipse'
-
-repositories {
-    mavenCentral()
-}
-
 dependencies {
+    compile project(':com.lwink.javashell')
     compile 'org.slf4j:slf4j-api:1.7.21'
     compile 'org.slf4j:slf4j-simple:1.7.21'
     testCompile 'junit:junit:4.12'
-}
-
-sourceSets {
-    main {
-       	java {
-            srcDir 'src'
-        }
-    }
-    test {
-        java {
-            srcDir 'test'
-        }
-    }
 }
 

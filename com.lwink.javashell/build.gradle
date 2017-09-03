@@ -7,24 +7,11 @@
  * user guide available at https://docs.gradle.org/3.0/userguide/tutorial_java_projects.html
  */
 
-buildscript {
-    repositories {
-        jcenter()
-    }
-}
-
 plugins {
     id "com.jfrog.bintray" version "1.7.3"
     id "com.jfrog.artifactory" version "4.5.1"
 }
-apply plugin: 'java'
-apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
-
-repositories {
-    jcenter()
-    mavenCentral()
-}
 
 dependencies {
     compile 'org.slf4j:slf4j-api:1.7.21'
@@ -32,21 +19,11 @@ dependencies {
     testCompile 'junit:junit:4.12'
 }
 
-sourceSets {
-    main {
-       	java {
-            srcDir 'src'
-        }
-    }
-    test {
-        java {
-            srcDir 'test'
-        }
-    }
-}
-
 // Use bintrayUpload task to upload to bintray
 // ./gradlew -PBINTRAY_KEY=xxxx bintrayUpload
+// Alternatively you can place the following in gradle.properties:
+// BINTRAY_KEY = xxxx
+// Do not but quotes around the key value or it will fail on some platforms
 bintray {
     user = 'lukewink'
     key = project.hasProperty('BINTRAY_KEY') ? project.property('BINTRAY_KEY') : System.getenv('BINTRAY_KEY')
@@ -130,7 +107,7 @@ artifactory {
         repository {
 	        repoKey = 'oss-snapshot-local'
 	        username = 'lukewink'
-            password = project.hasProperty('BINTRAY_KEY') ? project.property('BINTRAY_KEY') : System.getenv('BINTRAY_KEY')
+            password = project.hasProperty('BINTRAY_KEY') ? project.getProperty('BINTRAY_KEY') : System.getenv('BINTRAY_KEY')
 	    }
 	    defaults {
 	        publications('MyPublication')
@@ -141,4 +118,5 @@ artifactory {
 	        repoKey = 'libs-release'
 	    }
     }
+    clientConfig.setIncludeEnvVars(true)
 }
