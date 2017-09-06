@@ -53,6 +53,9 @@ public class ArrayDisplayBuffer implements DisplayBuffer
   @Override
   public void addText(String text, TextAttributes attributes)
   {
+  	// This is a pretty crude way of handling tab characters.  A better approach would be to
+  	// align tab stops on a particular column.
+  	text = text.replaceAll("\t", "  ");
     if (cellCount + text.length() > buffer.length)
     {
       rollBuffer();
