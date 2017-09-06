@@ -91,7 +91,7 @@ public class SshTerminalServer implements TerminalServer
   }
   
   @Override
-  public void stop()
+  public synchronized void stop()
   {
     LOG.info("Stopping ShellServer");
     try
