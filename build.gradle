@@ -3,10 +3,14 @@ buildscript {
     repositories {
         jcenter()
     }
+    dependencies {
+        classpath 'com.netflix.nebula:gradle-info-plugin:3.+'
+    }
 }
 
 subprojects {
     apply plugin: 'java'
+    apply plugin: 'nebula.info'
 
     repositories {
         jcenter()
