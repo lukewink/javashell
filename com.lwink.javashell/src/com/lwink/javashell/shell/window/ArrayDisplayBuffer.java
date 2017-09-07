@@ -56,6 +56,7 @@ public class ArrayDisplayBuffer implements DisplayBuffer
   	// This is a pretty crude way of handling tab characters.  A better approach would be to
   	// align tab stops on a particular column.
   	text = text.replaceAll("\t", "  ");
+  	
     if (cellCount + text.length() > buffer.length)
     {
       rollBuffer();
@@ -95,7 +96,7 @@ public class ArrayDisplayBuffer implements DisplayBuffer
     for (int i = 0; i < count; i++)
     {
       int cell = buffer[index++];
-      char c = (char)(cell & 0xFF);
+      char c = getCharFromCell(cell);
       if (c == (char)0)
         c = ' ';
       int newFgColor = (cell & 0x001F0000) >> 16;
@@ -169,7 +170,7 @@ public class ArrayDisplayBuffer implements DisplayBuffer
         col = 0;
       }
       int cell = buffer[cellIndex];
-      char c = (char)(cell & 0xFF);
+      char c = getCharFromCell(cell);
       
       if (c == '\n' || ++col >= width)
       {
@@ -220,7 +221,7 @@ public class ArrayDisplayBuffer implements DisplayBuffer
     
     // If the last character in the line is a newline character, then we don't 
     // want to count it.
-    if (count > 0 && buffer[lineEndIndex - 1] == '\n')
+    if (count > 0 && getCharFromCell(buffer[lineEndIndex - 1]) == '\n')
     {
       count--;
     }
@@ -328,5 +329,10 @@ public class ArrayDisplayBuffer implements DisplayBuffer
   	cellAttributes |= (bgPart << 21);
   	
   	return cellAttributes;
+  }
+  
+  private char getCharFromCell(int cell)
+  {
+  	return (char)(0x0000FFFF & cell);
   }
 }
