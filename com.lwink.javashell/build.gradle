@@ -12,6 +12,7 @@ plugins {
     id "com.jfrog.artifactory" version "4.5.1"
 }
 apply plugin: 'maven-publish'
+apply plugin: 'signing'
 
 dependencies {
     compile 'org.slf4j:slf4j-api:1.7.21'
@@ -72,7 +73,20 @@ publishing {
 		    artifact javadocJar
 		    groupId 'com.lwink'
 		    artifactId 'javashell'
-		    version '1.2.0-SNAPSHOT'
+		    version '1.2.0'
+		    
+		    project.tasks.withType(Sign) {
+		    	signatures.all {
+		    		def type = it.type
+		    		if (it.file.name.endsWith('.tar.gz.asc')) {
+		    			type = 'tar.gz.asc'
+		    		}
+		    		else if (it.type.equals('xml.asc')) {
+		    			type = 'pom.asc'
+		    		}
+		    		artifact source: it.file, classifier: it.classifier ?: null, extension: type
+		    	}
+		    }
 		    pom.withXml {
 		        def root = asNode()
 			    root.appendNode('description', 'A SSH shell that can be embedded in a java application')
@@ -120,3 +134,19 @@ artifactory {
     }
     clientConfig.setIncludeEnvVars(true)
 }
+
+signing {
+	sign configurations.archives
+}
+
+// See https://stackoverflow.com/questions/16560235/how-to-sign-maven-publications-with-gradle
+task signPom(type: Sign) {
+	sign project.file('build/publications/MyPublication/pom-default.xml')
+	outputs.upToDateWhen { false }
+}
+
+/*model {
+  	tasks.signPom {
+    	dependsOn tasks.generatePomFileForMavenPublication
+  	}
+}*/
