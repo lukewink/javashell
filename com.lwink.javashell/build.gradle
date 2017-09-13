@@ -37,10 +37,10 @@ bintray {
 	    vcsUrl = 'https://github.com/lukewink/javashell.git'
 
 	    version {
-	        name = '1.2.0'
-	        desc = 'javashell 1.2 release'
+	        name = '1.3.0'
+	        desc = 'javashell 1.3 release'
 	        released = new Date()
-	        vcsTag = '1.2.0'
+	        vcsTag = '1.3.0'
 	    }
     }
 }
@@ -73,7 +73,7 @@ publishing {
 		    artifact javadocJar
 		    groupId 'com.lwink'
 		    artifactId 'javashell'
-		    version '1.2.0'
+		    version '1.3.0-SNAPSHOT'
 		    
 		    project.tasks.withType(Sign) {
 		    	signatures.all {
