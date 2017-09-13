@@ -73,7 +73,7 @@ public class ArrayDisplayBuffer implements DisplayBuffer
     int cellAttributes = attributes != null  ? getCellAttributes(attributes) : 0;
     
     // Add the characters to the buffer
-    text.chars().forEach(c -> buffer[cellCount++] = c | cellAttributes);
+    text.chars().forEach(c -> addCharToBuffer(c, cellAttributes));
     
     // Recalulate the line indexes starting at the current line
     recalcualteLineIndexes(width, lineInsertIndex);
@@ -122,6 +122,25 @@ public class ArrayDisplayBuffer implements DisplayBuffer
     recalcualteLineIndexes(newWidth, 0);
     
     this.width = newWidth;
+  }
+  
+  /**
+   * Adds a character to the internal buffer if the character is allowable.
+   * 
+   * @param c The character to add.
+   * @param attributes The attributes to attach to the character.
+   */
+  protected void addCharToBuffer(int c, int attributes)
+  {
+  	if (c < 32)
+  	{
+  		// Negative or a control character
+  		if (c != 0x0A) // We allow '\n' since that is used to indicate a EOL
+  		{
+  			return; // Do nothing since this character is not allowed
+  		}
+  	}
+  	buffer[cellCount++] = c | attributes;
   }
   
   /**

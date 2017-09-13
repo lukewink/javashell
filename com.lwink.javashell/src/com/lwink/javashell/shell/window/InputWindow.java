@@ -126,6 +126,10 @@ public class InputWindow
    */
   public InputWindow addChar(char c)
   {
+  	if ((int)c < 32)
+  	{
+  		return this; // Do not attempt to display control characters
+  	}
     buffer.insert(bufferCursorPos + visiblePos, c);
     cursorRight();
     return this;
