@@ -30,3 +30,9 @@ subprojects {
         }
     }
 }
+
+task release(dependsOn: ':com.lwink.javashell:doRelease') {
+    doLast {
+        println 'Releasing to bintray'
+    }
+}

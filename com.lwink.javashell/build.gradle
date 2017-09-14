@@ -20,7 +20,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
 }
 
-ext.javashellVersion = '1.3.0-SNAPSHOT'
+ext.javashellVersion = '1.2.1'
 ext.isReleaseVersion = !javashellVersion.endsWith("SNAPSHOT")
 
 // Use bintrayUpload task to upload to bintray
@@ -80,7 +80,6 @@ publishing {
             
             project.tasks.withType(Sign) {
                 signatures.all {
-                    onlyIf { isReleaseVersion }
                     def type = it.type
                     if (it.file.name.endsWith('.tar.gz.asc')) {
                         type = 'tar.gz.asc'
@@ -140,7 +139,7 @@ artifactory {
 }
 
 signing {
-    required { gradle.taskGraph.hasTask("uploadArchives") }
+    required { isReleaseVersion && gradle.taskGraph.hasTask("doRelease") }
     sign configurations.archives
 }
 
@@ -148,6 +147,14 @@ signing {
 task signPom(type: Sign) {
     sign project.file('build/publications/MyPublication/pom-default.xml')
     outputs.upToDateWhen { false }
+}
+
+task doRelease {
+    dependsOn 'bintrayUpload'
+    dependsOn 'signArchives'
+    dependsOn 'signPom'
+    tasks.findByName('bintrayUpload').mustRunAfter 'signPom'
+    tasks.findByName('signPom').mustRunAfter 'signArchives'
 }
 
 /*model {
