@@ -20,6 +20,9 @@ dependencies {
     testCompile 'junit:junit:4.12'
 }
 
+ext.javashellVersion = '1.3.0-SNAPSHOT'
+ext.isReleaseVersion = !javashellVersion.endsWith("SNAPSHOT")
+
 // Use bintrayUpload task to upload to bintray
 // ./gradlew -PBINTRAY_KEY=xxxx bintrayUpload
 // Alternatively you can place the following in gradle.properties:
@@ -31,34 +34,34 @@ bintray {
     publications = ['MyPublication']
     pkg {
         repo = 'javashell'
-	    name = 'javashell'
-	    userOrg = 'lukewink'
-	    licenses = ['Apache-2.0']
-	    vcsUrl = 'https://github.com/lukewink/javashell.git'
+        name = 'javashell'
+        userOrg = 'lukewink'
+        licenses = ['Apache-2.0']
+        vcsUrl = 'https://github.com/lukewink/javashell.git'
 
-	    version {
-	        name = '1.3.0'
-	        desc = 'javashell 1.3 release'
-	        released = new Date()
-	        vcsTag = '1.3.0'
-	    }
+        version {
+            name = javashellVersion
+            desc = 'javashell release'
+            released = new Date()
+            vcsTag = javashellVersion
+        }
     }
 }
 
 def pomConfig = {
     licenses {
         license {
-	        name "The Apache Software License, Version 2.0"
+            name "The Apache Software License, Version 2.0"
             url "http://www.apache.org/licenses/LICENSE-2.0.txt"
             distribution "repo"
-	    }
+        }
     }
     developers {
         developer {
-	        id "lukewink"
-	        name "Luke Winkenbach"
-	        email "lukewink@gmail.com"
-	    }
+            id "lukewink"
+            name "Luke Winkenbach"
+            email "lukewink@gmail.com"
+        }
     }
     scm {
         url "https://github.com/lukewink/javashell.git"
@@ -68,33 +71,34 @@ def pomConfig = {
 publishing {
     publications {
         MyPublication(MavenPublication) {
-		    from components.java
-		    artifact sourcesJar
-		    artifact javadocJar
-		    groupId 'com.lwink'
-		    artifactId 'javashell'
-		    version '1.3.0-SNAPSHOT'
-		    
-		    project.tasks.withType(Sign) {
-		    	signatures.all {
-		    		def type = it.type
-		    		if (it.file.name.endsWith('.tar.gz.asc')) {
-		    			type = 'tar.gz.asc'
-		    		}
-		    		else if (it.type.equals('xml.asc')) {
-		    			type = 'pom.asc'
-		    		}
-		    		artifact source: it.file, classifier: it.classifier ?: null, extension: type
-		    	}
-		    }
-		    pom.withXml {
-		        def root = asNode()
-			    root.appendNode('description', 'A SSH shell that can be embedded in a java application')
-			    root.appendNode('name', 'javashell')
-			    root.appendNode('url', 'https://github.com/lukewink/javashell')
-			    root.children().last() + pomConfig
-	        }
-	    }
+            from components.java
+            artifact sourcesJar
+            artifact javadocJar
+            groupId 'com.lwink'
+            artifactId 'javashell'
+            version javashellVersion
+            
+            project.tasks.withType(Sign) {
+                signatures.all {
+                    onlyIf { isReleaseVersion }
+                    def type = it.type
+                    if (it.file.name.endsWith('.tar.gz.asc')) {
+                        type = 'tar.gz.asc'
+                    }
+                    else if (it.type.equals('xml.asc')) {
+                        type = 'pom.asc'
+                    }
+                    artifact source: it.file, classifier: it.classifier ?: null, extension: type
+                }
+            }
+            pom.withXml {
+                def root = asNode()
+                root.appendNode('description', 'A SSH shell that can be embedded in a java application')
+                root.appendNode('name', 'javashell')
+                root.appendNode('url', 'https://github.com/lukewink/javashell')
+                root.children().last() + pomConfig
+            }
+        }
     }
 }
 
@@ -119,34 +123,35 @@ artifactory {
     contextUrl = 'http://oss.jfrog.org/artifactory'
     publish {
         repository {
-	        repoKey = 'oss-snapshot-local'
-	        username = 'lukewink'
+            repoKey = 'oss-snapshot-local'
+            username = 'lukewink'
             password = project.hasProperty('BINTRAY_KEY') ? project.getProperty('BINTRAY_KEY') : System.getenv('BINTRAY_KEY')
-	    }
-	    defaults {
-	        publications('MyPublication')
-	    }
+        }
+        defaults {
+            publications('MyPublication')
+        }
     }
     resolve {
         repository {
-	        repoKey = 'libs-release'
-	    }
+            repoKey = 'libs-release'
+        }
     }
     clientConfig.setIncludeEnvVars(true)
 }
 
 signing {
-	sign configurations.archives
+    required { gradle.taskGraph.hasTask("uploadArchives") }
+    sign configurations.archives
 }
 
 // See https://stackoverflow.com/questions/16560235/how-to-sign-maven-publications-with-gradle
 task signPom(type: Sign) {
-	sign project.file('build/publications/MyPublication/pom-default.xml')
-	outputs.upToDateWhen { false }
+    sign project.file('build/publications/MyPublication/pom-default.xml')
+    outputs.upToDateWhen { false }
 }
 
 /*model {
-  	tasks.signPom {
-    	dependsOn tasks.generatePomFileForMavenPublication
-  	}
+      tasks.signPom {
+        dependsOn tasks.generatePomFileForMavenPublication
+      }
 }*/
