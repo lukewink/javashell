@@ -157,8 +157,11 @@ task doRelease {
     tasks.findByName('signPom').mustRunAfter 'signArchives'
 }
 
-/*model {
-      tasks.signPom {
-        dependsOn tasks.generatePomFileForMavenPublication
-      }
-}*/
+model {
+    tasks.publishMyPublicationPublicationToMavenLocal {
+        dependsOn project.tasks.withType(Sign)
+    }
+    tasks.signPom {
+        dependsOn tasks.generatePomFileForMyPublicationPublication
+    }
+}
