@@ -58,6 +58,8 @@ public class InputOutputShell implements Shell
   /** A callback to receive terminal input */
   private Optional<InputCallback> inputCallback = Optional.empty();
   
+  private boolean closed = false;
+  
   public InputOutputShell(Terminal terminal)
   {
     this.terminal = terminal;
@@ -79,6 +81,7 @@ public class InputOutputShell implements Shell
   @Override
   public void close()
   {
+  	closed = true;
     terminal.exitPrivateMode();
     terminal.stop();
   }
@@ -92,6 +95,7 @@ public class InputOutputShell implements Shell
   @Override
   public void addOutput(String string, TextAttributes attributes, boolean addNewLine, boolean refresh)
   {
+  	checkShell();
   	if (addNewLine)
   	{
   		string += '\n';
@@ -107,6 +111,7 @@ public class InputOutputShell implements Shell
   @Override
   public void refresh()
   {
+  	checkShell();
     mainWindow.refresh();
     inputWindow.resetCursorPosition();
     terminal.flush();
@@ -121,10 +126,23 @@ public class InputOutputShell implements Shell
   @Override
 	public void setPrompt(String newPrompt)
 	{
+  	checkShell();
 		inputWindow.setPrompt(newPrompt);
 		inputWindow.refresh();
 		terminal.flush();
 	}
+  
+  /**
+   * Checks to ensure the shell has not been closed.  If the shell has been closed,
+   * a runtime exception is thrown.
+   */
+  protected void checkShell()
+  {
+  	if (closed)
+  	{
+  		throw new RuntimeException("Shell has been closed");
+  	}
+  }
   
   /**
    * Called when there is input ready to be processed
