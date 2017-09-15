@@ -20,7 +20,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
 }
 
-ext.javashellVersion = '1.2.1'
+ext.javashellVersion = '1.2.2'
 ext.isReleaseVersion = !javashellVersion.endsWith("SNAPSHOT")
 
 // Use bintrayUpload task to upload to bintray
