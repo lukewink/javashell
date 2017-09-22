@@ -15,6 +15,8 @@
  **/
 package com.lwink.javashell.shell.api;
 
+import com.lwink.javashell.terminal.api.TermSize;
+
 public interface Shell
 {
 	/**
@@ -88,4 +90,11 @@ public interface Shell
    * @param newPrompt A String to set as the new input prompt.
    */
   void setPrompt(String newPrompt);
+  
+  /**
+   * Get the size of the display window.
+   * 
+   * @return The size of the display window
+   */
+  TermSize getOutputWindowSize();
 }

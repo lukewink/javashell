@@ -132,6 +132,13 @@ public class InputOutputShell implements Shell
 		terminal.flush();
 	}
   
+  @Override
+  public TermSize getOutputWindowSize()
+  {
+  	// TODO: this should come from the mainWindow instance
+  	return new TermSize(columns, rows - 1);
+  }
+  
   /**
    * Checks to ensure the shell has not been closed.  If the shell has been closed,
    * a runtime exception is thrown.
