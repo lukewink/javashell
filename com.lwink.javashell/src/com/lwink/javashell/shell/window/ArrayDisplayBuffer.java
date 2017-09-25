@@ -18,6 +18,7 @@ package com.lwink.javashell.shell.window;
 import com.lwink.javashell.shell.api.TextAttributes;
 import com.lwink.javashell.terminal.api.TermColor;
 import com.lwink.javashell.terminal.api.Terminal;
+import com.lwink.javashell.util.Preconditions;
 
 /**
  * The display buffer implementation.  Internally, everything is stored as an
@@ -76,7 +77,7 @@ public class ArrayDisplayBuffer implements DisplayBuffer
     text.chars().forEach(c -> addCharToBuffer(c, cellAttributes));
     
     // Recalulate the line indexes starting at the current line
-    recalcualteLineIndexes(width, lineInsertIndex);
+    recalculateLineIndexes(width, lineInsertIndex);
   }
   
   @Override
@@ -111,7 +112,11 @@ public class ArrayDisplayBuffer implements DisplayBuffer
       	terminal.setBackgroundColor(toTermColor(newBgColor));
       	bgColor = newBgColor;
       }
-      terminal.putCharacter(c);
+
+      if (c != '\n')
+      {
+      	terminal.putCharacter(c);
+      }
     }
     terminal.eraseCharacters(width - count);
   }
@@ -119,7 +124,7 @@ public class ArrayDisplayBuffer implements DisplayBuffer
   @Override
   public void resizeWidth(int newWidth)
   { 
-    recalcualteLineIndexes(newWidth, 0);
+    recalculateLineIndexes(newWidth, 0);
     
     this.width = newWidth;
   }
@@ -157,7 +162,7 @@ public class ArrayDisplayBuffer implements DisplayBuffer
       buffer[cellIndex++] = buffer[i];
     }
     cellCount = cellIndex;
-    recalcualteLineIndexes(width, 0);
+    recalculateLineIndexes(width, 0);
   }
   
   /**
@@ -168,7 +173,7 @@ public class ArrayDisplayBuffer implements DisplayBuffer
    * @param width The width of the terminal
    * @param startLineIndex The line at which to start the calculation.
    */
-  protected void recalcualteLineIndexes(int width, int startLineIndex)
+  protected void recalculateLineIndexes(int width, int startLineIndex)
   {
     if (startLineIndex > lineInsertIndex)
     {
@@ -179,21 +184,30 @@ public class ArrayDisplayBuffer implements DisplayBuffer
     lineInsertIndex = startLineIndex;
     int cellIndex = lineIndexes[startLineIndex];
     int col = 0;
-    boolean newLineOnNextChar = false;
+    boolean foundNewline = false;
+    boolean reachedEndOfWidth = false;
     while (cellIndex < cellCount)
     {
-      if (newLineOnNextChar)
+    	int cell = buffer[cellIndex];
+      char c = getCharFromCell(cell);
+      
+      // We want to draw a new line if our previous character was a newline or if
+      // we have run out of room to draw the next character.
+      if (foundNewline || reachedEndOfWidth && c != '\n')
       {
-        newLineOnNextChar = false;
+      	foundNewline = false;
+      	reachedEndOfWidth = false;
         newLine(cellIndex);
         col = 0;
       }
-      int cell = buffer[cellIndex];
-      char c = getCharFromCell(cell);
       
-      if (c == '\n' || ++col >= width)
+      if (c == '\n')
       {
-        newLineOnNextChar = true;
+        foundNewline = true;
+      }
+      else if (++col >= width)
+      {
+        reachedEndOfWidth = true;
       }
       cellIndex++;
     }
