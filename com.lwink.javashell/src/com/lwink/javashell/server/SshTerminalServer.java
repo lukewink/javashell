@@ -19,10 +19,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collection;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.sshd.common.Factory;
+import org.apache.sshd.common.NamedFactory;
 import org.apache.sshd.common.config.keys.KeyUtils;
+import org.apache.sshd.common.kex.KeyExchange;
 import org.apache.sshd.server.Command;
 import org.apache.sshd.server.Environment;
 import org.apache.sshd.server.ExitCallback;
@@ -39,6 +43,7 @@ import com.lwink.javashell.server.api.TerminalClosedListener;
 import com.lwink.javashell.server.api.TerminalCreatedListener;
 import com.lwink.javashell.server.api.TerminalServer;
 import com.lwink.javashell.terminal.SshAnsiTerminal;
+import com.lwink.javashell.util.Preconditions;
 
 public class SshTerminalServer implements TerminalServer
 {
@@ -49,12 +54,21 @@ public class SshTerminalServer implements TerminalServer
   private int port;
   private File keyFile;
   private Authenticator authenticator;
+  private Collection<String> supportedCiphers;
+  private Collection<NamedFactory<KeyExchange>> supportedKeyExchangeAlgorithms;
+  private Collection<String> supportedMacs;
+  private boolean started;
   
   public SshTerminalServer(int port, File keyFile, Authenticator authenticator)
   {
   	this.port = port;
   	this.keyFile = keyFile;
   	this.authenticator = authenticator;
+  	this.sshd = SshServer.setUpDefaultServer();
+  	this.supportedCiphers = sshd.getCipherFactoriesNames();
+  	this.supportedKeyExchangeAlgorithms = sshd.getKeyExchangeFactories();
+  	this.supportedMacs = sshd.getMacFactoriesNames();
+  	this.started = false;
   }
   
   @Override
@@ -69,11 +83,17 @@ public class SshTerminalServer implements TerminalServer
       AbstractGeneratorHostKeyProvider hostKeyProvider = new SimpleGeneratorHostKeyProvider(keyFile);
       hostKeyProvider.setAlgorithm(KeyUtils.RSA_ALGORITHM);
       
-      sshd = SshServer.setUpDefaultServer();
       sshd.setPort(port);
       sshd.setKeyPairProvider(hostKeyProvider);
       sshd.setPasswordAuthenticator(this::authenticate);
       sshd.setShellFactory(new ShellFactory());
+      
+      LOG.info("Cipher factories: {}", sshd.getCipherFactoriesNameList());
+      
+      LOG.info("Key exchange factories: {}", sshd.getKeyExchangeFactories());
+      LOG.info("Compression factories: {}", sshd.getCompressionFactoriesNameList());
+      LOG.info("MAC factories: {}", sshd.getMacFactoriesNameList());
+
       sshd.start();
     }
     catch (IOException e)
@@ -81,8 +101,53 @@ public class SshTerminalServer implements TerminalServer
       LOG.error("Failed to start", e);
       throw new RuntimeException(e);
     }
+    started = true;
     LOG.info("ShellServer has been started");
   }
+  
+  @Override
+	public Collection<String> getSupportedKeyExchangeAlgorithms()
+  {
+  	return supportedKeyExchangeAlgorithms
+  			.stream()
+  			.map(nf -> nf.getName())
+  			.collect(Collectors.toList());
+  }
+  
+  @Override
+	public void setKeyExchangeAlgorithms(Collection<String> algorithms)
+  {
+  	Preconditions.checkState(!started);
+  	sshd.setKeyExchangeFactories(supportedKeyExchangeAlgorithms
+  			.stream()
+  			.filter(nf -> algorithms.contains(nf.getName()))
+  			.collect(Collectors.toList()));
+  }
+  
+  @Override
+	public Collection<String> getSupportedCiphers()
+  {
+  	return supportedCiphers;
+  }
+  
+  @Override
+	public void setCiphers(Collection<String> ciphers)
+  {
+  	Preconditions.checkState(!started);
+  	sshd.setCipherFactoriesNames(ciphers);
+  }
+  
+  @Override
+  public void setMacs(Collection<String> macs)
+  {
+  	sshd.setMacFactoriesNames(macs);
+  }
+	
+  @Override
+	public Collection<String> getSupportedMacs()
+	{
+  	return supportedMacs;
+	}
   
   @Override
   public synchronized void waitForStop() throws InterruptedException
@@ -103,6 +168,7 @@ public class SshTerminalServer implements TerminalServer
     {
       LOG.error("Failed to stop ShellServer", e);
     }
+    started = false;
   }
   
   /**

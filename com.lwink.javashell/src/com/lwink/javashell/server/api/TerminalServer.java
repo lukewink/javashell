@@ -15,6 +15,8 @@
  **/
 package com.lwink.javashell.server.api;
 
+import java.util.Collection;
+
 public interface TerminalServer
 {
 	void start(TerminalCreatedListener terminalCreatedListener, TerminalClosedListener terminalClosedListener);
@@ -34,6 +36,55 @@ public interface TerminalServer
   void stop();
   
   /**
+   * Sets the ciphers for the SSH server to use.  This cannot be called after calling 
+   * {@link #start(TerminalCreatedListener, TerminalClosedListener)} otherwise an exception will be thrown.
+   * If this function is not called, this all supported ciphers can be used.
+   * 
+   * @param ciphers The ciphers to support.  Must be a subset of the list returned by {@link #getSupportedCiphers()}.
+   */
+  void setCiphers(Collection<String> ciphers);
+
+  /**
+   * Gets a collection of encryption ciphers that are supported by the SSH server.
+   * 
+   * @return A list of implemented ciphers.
+   */
+	Collection<String> getSupportedCiphers();
+
+	/**
+	 * Sets the key exchange algorithms to use.  This cannot be called after calling
+	 * {@link #start(TerminalCreatedListener, TerminalClosedListener)} otherwise an exception will be 
+	 * thrown.  If this function is not called, then all supported key exchange algorithms can be used.
+	 * 
+	 * @param algorithms The algorithms to support.  Must be a subset of the list returned by
+	 *        {@link #getSupportedKeyExchangeAlgorithms()}
+	 */
+	void setKeyExchangeAlgorithms(Collection<String> algorithms);
+
+	/**
+	 * Gets a collection of all supported key exchange algorithms that the SSH server can support.
+	 * 
+	 * @return Implemented key exchange algorithms.
+	 */
+	Collection<String> getSupportedKeyExchangeAlgorithms();
+	
+	/**
+	 * Set the MAC algorithms that the SSH server should support. This cannot be called after calling
+	 * {@link #start(TerminalCreatedListener, TerminalClosedListener)} otherwise an exception will be 
+	 * thrown.  If this function is not called, then all supported MAC algorithms can be used.
+	 * 
+	 * @param macs A list of MAC algorithms.  This should be a subset of what was returned by {@link #getSupportedMacs()}
+	 */
+	void setMacs(Collection<String> macs);
+	
+	/**
+	 * Return the supported MAC algorithms.
+	 * 
+	 * @return MAC algorithms that are implemented on the server.
+	 */
+	Collection<String> getSupportedMacs();
+
+	/**
    * A builder to create a TerminalServer.
    * 
    * @return Newly created TerminalServer.

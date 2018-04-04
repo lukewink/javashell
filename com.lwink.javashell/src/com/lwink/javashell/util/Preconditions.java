@@ -50,4 +50,20 @@ public class Preconditions
 			throw new IllegalArgumentException(message);
 		}
 	}
+	
+	public static void checkState(boolean b)
+	{
+		if (b == false)
+		{
+			throw new IllegalStateException();
+		}
+	}
+	
+	public static void checkState(boolean b, String message)
+	{
+		if (b == false)
+		{
+			throw new IllegalStateException(message);
+		}
+	}
 }
